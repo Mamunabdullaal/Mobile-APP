@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>OmniTask: Productivity Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #059669;
+            --primary-bg: #f0fdf4;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body[data-mode="WORK"] {
+            --primary: #4f46e5;
+            --primary-bg: #f5f3ff;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-bg);
+            transition: var(--transition);
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            overflow-x: hidden;
+        }
+
+        .card {
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 4px 12px -2px rgb(0 0 0 / 0.04);
+            border: 1px solid rgba(0,0,0,0.02);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            transition: var(--transition);
+            font-weight: 800;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.96);
+        }
+
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e5e7eb;
+            z-index: 0;
+        }
+
+        .calendar-grid div {
+            aspect-ratio: 1/1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            border-radius: 14px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: var(--transition);
+        }
+
+        .calendar-grid .has-tasks::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+
+        .active-tab {
+            color: var(--primary);
+            position: relative;
+        }
+        
+        .active-tab::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 10px;
+        }
+
+        /* Modal Overlay Animation */
+        #taskModal {
+            transition: opacity 0.3s ease;
+        }
+        #taskModal .modal-content {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        #taskModal.hidden {
+            display: none;
+            opacity: 0;
+        }
+        #taskModal.hidden .modal-content {
+            transform: translateY(100%);
+        }
+
+        /* Custom scrollbar for mobile */
+        ::-webkit-scrollbar {
+            width: 0px;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react/": "https://esm.sh/react@^19.2.3/"
+  }
+}
+</script>
+</head>
+<body data-mode="STUDY">
+
+    <!-- App Header -->
+    <header class="pt-10 px-6 pb-6 sticky top-0 bg-inherit z-40">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h1 id="modeTitle" class="text-3xl font-extrabold text-gray-900 tracking-tight">Study Deck</h1>
+                <p id="modeSubtitle" class="text-gray-400 text-xs font-bold uppercase tracking-widest">Daily Schedule</p>
+            </div>
+            <button onclick="toggleMode()" class="flex items-center gap-3 bg-white px-5 py-2.5 rounded-2xl shadow-sm border border-gray-100 active:scale-95 transition-all">
+                <span id="modeIcon" class="w-3 h-3 rounded-full bg-emerald-500 shadow-sm shadow-emerald-200"></span>
+                <span class="text-[11px] font-extrabold uppercase tracking-widest text-gray-700">Switch</span>
+            </button>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="card p-6 border border-gray-50/50">
+            <div class="flex justify-between items-end mb-3">
+                <span class="text-xs font-extrabold text-gray-500 uppercase tracking-widest">Today's Progress</span>
+                <span id="progressText" class="text-xs font-black text-[var(--primary)] uppercase">0/0 Tasks</span>
+            </div>
+            <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                <div id="progressBar" class="h-full bg-[var(--primary)] transition-all duration-1000 ease-in-out" style="width: 0%"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content Controller -->
+    <main class="px-6 pb-40">
+        <div class="flex items-center gap-8 mb-10 overflow-x-auto no-scrollbar py-2">
+            <button onclick="switchView('today')" id="tabToday" class="text-lg font-extrabold active-tab whitespace-nowrap">Today</button>
+            <button onclick="switchView('calendar')" id="tabCalendar" class="text-lg font-extrabold text-gray-300 whitespace-nowrap">History</button>
+            <button onclick="switchView('settings')" id="tabSettings" class="text-lg font-extrabold text-gray-300 whitespace-nowrap">Settings</button>
+        </div>
+
+        <div id="viewContainer" class="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <!-- Content dynamically rendered -->
+        </div>
+    </main>
+
+    <!-- FAB Button -->
+    <button onclick="openModal()" class="fixed bottom-28 right-6 w-16 h-16 btn-primary rounded-[22px] shadow-2xl shadow-[var(--primary)]/30 flex items-center justify-center z-50">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"/></svg>
+    </button>
+
+    <!-- Nav Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 h-24 bg-white/80 backdrop-blur-2xl border-t border-gray-100 flex items-center justify-around px-8 z-40 pb-4">
+        <button onclick="switchView('today')" class="flex flex-col items-center gap-1 group">
+            <svg class="w-7 h-7 text-gray-400 group-hover:text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-width="2.2"/></svg>
+            <span class="text-[9px] font-black uppercase text-gray-400 tracking-tighter">Deck</span>
+        </button>
+        <button onclick="switchView('calendar')" class="flex flex-col items-center gap-1 group">
+            <svg class="w-7 h-7 text-gray-400 group-hover:text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-width="2.2"/></svg>
+            <span class="text-[9px] font-black uppercase text-gray-400 tracking-tighter">Reports</span>
+        </button>
+        <button onclick="switchView('settings')" class="flex flex-col items-center gap-1 group">
+            <svg class="w-7 h-7 text-gray-400 group-hover:text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" stroke-width="2.2"/></svg>
+            <span class="text-[9px] font-black uppercase text-gray-400 tracking-tighter">Tools</span>
+        </button>
+    </nav>
+
+    <!-- New Task Overlay -->
+    <div id="taskModal" class="hidden fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-md">
+        <div class="modal-content w-full sm:max-w-md bg-white rounded-t-[42px] sm:rounded-[42px] p-8 shadow-2xl">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-black text-gray-900" id="modalTitle">Add Item</h2>
+                <button onclick="closeModal()" class="p-2.5 bg-gray-50 rounded-2xl text-gray-400 active:scale-90 transition-all"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2.5"/></svg></button>
+            </div>
+            
+            <form id="taskForm" class="space-y-5">
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Task Title</label>
+                    <input id="title" required type="text" class="w-full px-6 py-4 rounded-3xl bg-gray-50 border-none focus:ring-4 focus:ring-[var(--primary)]/10 text-gray-900 font-semibold" placeholder="What's the plan?">
+                </div>
+                
+                <div id="studyFields" class="space-y-5">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Subject</label>
+                        <input id="subject" type="text" class="w-full px-6 py-4 rounded-3xl bg-gray-50 border-none focus:ring-4 focus:ring-[var(--primary)]/10 text-gray-900 font-semibold" placeholder="e.g. Mathematics">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Date</label>
+                        <input id="date" required type="date" class="w-full px-6 py-4 rounded-3xl bg-gray-50 border-none focus:ring-4 focus:ring-[var(--primary)]/10 text-gray-900 font-semibold">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Time</label>
+                        <input id="time" required type="time" class="w-full px-6 py-4 rounded-3xl bg-gray-50 border-none focus:ring-4 focus:ring-[var(--primary)]/10 text-gray-900 font-semibold">
+                    </div>
+                </div>
+
+                <div id="durationField" class="space-y-2">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Duration (minutes)</label>
+                    <input id="duration" type="number" class="w-full px-6 py-4 rounded-3xl bg-gray-50 border-none focus:ring-4 focus:ring-[var(--primary)]/10 text-gray-900 font-semibold" value="60">
+                </div>
+
+                <div class="space-y-2 pb-4">
+                    <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Details (Optional)</label>
+                    <textarea id="details" class="w-full px-6 py-4 rounded-3xl bg-gray-50 border-none focus:ring-4 focus:ring-[var(--primary)]/10 text-gray-900 font-semibold" rows="2"></textarea>
+                </div>
+
+                <button type="submit" class="w-full py-5 btn-primary rounded-3xl font-black uppercase tracking-widest text-sm shadow-xl shadow-[var(--primary)]/20">Launch Task</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // --- Core Application State ---
+        let state = {
+            mode: localStorage.getItem('omni_mode') || 'STUDY',
+            tasks: JSON.parse(localStorage.getItem('omni_tasks')) || [],
+            currentView: 'today',
+            notified: new Set(),
+            selectedDate: new Date().toISOString().split('T')[0]
+        };
+
+        const THEMES = {
+            STUDY: { primary: '#059669', title: 'Study Deck', sub: 'Daily Schedule', color: 'emerald' },
+            WORK: { primary: '#4f46e5', title: 'Work Suite', sub: 'Corporate Plan', color: 'indigo' }
+        };
+
+        // --- Core Engine ---
+        function toggleMode() {
+            state.mode = state.mode === 'STUDY' ? 'WORK' : 'STUDY';
+            localStorage.setItem('omni_mode', state.mode);
+            document.body.setAttribute('data-mode', state.mode);
+            updateUI();
+        }
+
+        function saveState() {
+            localStorage.setItem('omni_tasks', JSON.stringify(state.tasks));
+            updateUI();
+        }
+
+        function switchView(view) {
+            state.currentView = view;
+            const tabIds = ['tabToday', 'tabCalendar', 'tabSettings'];
+            tabIds.forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.remove('active-tab', 'text-gray-900');
+                el.classList.add('text-gray-300');
+            });
+            
+            const activeId = 'tab' + view.charAt(0).toUpperCase() + view.slice(1);
+            const activeEl = document.getElementById(activeId);
+            activeEl.classList.add('active-tab', 'text-gray-900');
+            activeEl.classList.remove('text-gray-300');
+            
+            updateUI();
+        }
+
+        function updateUI() {
+            const theme = THEMES[state.mode];
+            document.getElementById('modeTitle').innerText = theme.title;
+            document.getElementById('modeSubtitle').innerText = theme.sub;
+            document.getElementById('modeIcon').style.backgroundColor = theme.primary;
+            
+            // Dynamic form visibility
+            const isStudy = state.mode === 'STUDY';
+            document.getElementById('studyFields').style.display = isStudy ? 'block' : 'none';
+            document.getElementById('durationField').style.display = isStudy ? 'block' : 'none';
+
+            // Today's Progress Stats
+            const today = new Date().toISOString().split('T')[0];
+            const todayTasks = state.tasks.filter(t => t.date === today && t.mode === state.mode);
+            const done = todayTasks.filter(t => t.completed).length;
+            const pct = todayTasks.length > 0 ? (done / todayTasks.length) * 100 : 0;
+            
+            document.getElementById('progressBar').style.width = pct + '%';
+            document.getElementById('progressText').innerText = `${done}/${todayTasks.length} DONE`;
+
+            renderCurrentView();
+        }
+
+        function renderCurrentView() {
+            const container = document.getElementById('viewContainer');
+            container.innerHTML = '';
+
+            if (state.currentView === 'today') {
+                renderTodayView(container);
+            } else if (state.currentView === 'calendar') {
+                renderHistoryView(container);
+            } else if (state.currentView === 'settings') {
+                renderSettingsView(container);
+            }
+        }
+
+        function renderTodayView(container) {
+            const today = new Date().toISOString().split('T')[0];
+            const tasks = state.tasks
+                .filter(t => t.date === today && t.mode === state.mode)
+                .sort((a, b) => a.time.localeCompare(b.time));
+
+            if (tasks.length === 0) {
+                container.innerHTML = `
+                    <div class="py-32 flex flex-col items-center opacity-20 grayscale">
+                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2"/></svg>
+                        <p class="font-extrabold uppercase tracking-widest text-xs">Deck Empty</p>
+                    </div>`;
+                return;
+            }
+
+            const listWrapper = document.createElement('div');
+            listWrapper.className = state.mode === 'STUDY' ? 'timeline-line relative space-y-8 pl-4' : 'space-y-4';
+
+            tasks.forEach(task => {
+                const item = document.createElement('div');
+                item.className = 'card p-6 relative group active:scale-[0.98] transition-all';
+                
+                const dot = state.mode === 'STUDY' ? `<div class="absolute -left-[1.62rem] top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-4 border-white bg-[var(--primary)] z-10 shadow-sm"></div>` : '';
+
+                item.innerHTML = `
+                    ${dot}
+                    <div class="flex items-start gap-4">
+                        <button onclick="toggleCompletion('${task.id}')" class="mt-1 w-7 h-7 rounded-xl border-2 border-gray-100 flex items-center justify-center transition-all ${task.completed ? 'bg-[var(--primary)] border-[var(--primary)]' : 'bg-gray-50'}">
+                            ${task.completed ? '<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M5 13l4 4L19 7"/></svg>' : ''}
+                        </button>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-start mb-1">
+                                <h3 class="font-extrabold text-gray-800 truncate ${task.completed ? 'line-through text-gray-300' : ''}">${task.title}</h3>
+                                <span class="text-[10px] font-black text-gray-400 bg-gray-50 px-2 py-1 rounded-lg uppercase whitespace-nowrap">${task.time}</span>
+                            </div>
+                            ${task.subject ? `<p class="text-[10px] font-black text-[var(--primary)] uppercase tracking-tight">${task.subject}</p>` : ''}
+                            <p class="text-sm text-gray-400 mt-2 leading-relaxed ${task.completed ? 'opacity-50' : ''}">${task.details || 'No additional notes.'}</p>
+                            ${task.duration ? `<div class="mt-4 flex items-center gap-1.5 text-[10px] font-extrabold text-gray-300 uppercase"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2"/></svg>${task.duration} MIN SESSION</div>` : ''}
+                        </div>
+                        <button onclick="removeTask('${task.id}')" class="text-gray-200 hover:text-red-400 transition-colors pl-2"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-width="2"/></svg></button>
+                    </div>
+                `;
+                listWrapper.appendChild(item);
+            });
+            container.appendChild(listWrapper);
+        }
+
+        function renderHistoryView(container) {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDay = new Date(year, month, 1).getDay();
+
+            container.innerHTML = `
+                <div class="card p-8 mb-8">
+                    <div class="flex justify-between items-center mb-8">
+                        <div>
+                            <h2 class="text-2xl font-black text-gray-900">${now.toLocaleString('default', { month: 'long' })}</h2>
+                            <p class="text-[10px] font-black text-gray-300 uppercase tracking-widest">Progress Calendar</p>
+                        </div>
+                        <span class="text-xs font-black text-gray-100 uppercase bg-gray-50 px-3 py-1 rounded-full">${year}</span>
+                    </div>
+                    <div class="grid grid-cols-7 gap-2 text-center calendar-grid">
+                        ${['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => `<div class="text-[10px] font-black text-gray-300 pb-2">${d}</div>`).join('')}
+                        ${Array(firstDay).fill('<div></div>').join('')}
+                        ${Array.from({ length: daysInMonth }, (_, i) => {
+                            const d = i + 1;
+                            const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                            const hasTasks = state.tasks.some(t => t.date === dStr && t.mode === state.mode);
+                            const active = state.selectedDate === dStr;
+                            return `<div onclick="selectHistoryDate('${dStr}')" class="relative ${hasTasks ? 'has-tasks' : ''} ${active ? 'bg-[var(--primary)] text-white shadow-xl shadow-[var(--primary)]/30 scale-110' : 'hover:bg-gray-50'}">${d}</div>`;
+                        }).join('')}
+                    </div>
+                </div>
+                <div id="dateReport" class="animate-in fade-in duration-700"></div>
+            `;
+            renderDailySummary();
+        }
+
+        function selectHistoryDate(date) {
+            state.selectedDate = date;
+            renderCurrentView();
+        }
+
+        function renderDailySummary() {
+            const summaryContainer = document.getElementById('dateReport');
+            const tasks = state.tasks.filter(t => t.date === state.selectedDate && t.mode === state.mode);
+            const done = tasks.filter(t => t.completed).length;
+            const pct = tasks.length > 0 ? Math.round((done / tasks.length) * 100) : 0;
+
+            summaryContainer.innerHTML = `
+                <div class="card p-8 bg-gray-900 text-white shadow-2xl">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-black uppercase tracking-tighter text-xs text-gray-400">Analysis: ${state.selectedDate}</h3>
+                        <span class="text-[10px] font-black px-3 py-1 bg-[var(--primary)] text-white rounded-full">${pct}% SUCCESS</span>
+                    </div>
+                    <div class="space-y-4">
+                        ${tasks.length === 0 ? '<p class="text-center text-xs text-gray-500 font-extrabold py-8 uppercase tracking-widest">No activities found</p>' : 
+                        tasks.map(t => `
+                            <div class="flex justify-between items-center py-3 border-b border-white/5 last:border-0">
+                                <span class="text-sm font-bold ${t.completed ? 'text-gray-500 line-through' : 'text-gray-100'}">${t.title}</span>
+                                <span class="text-[9px] font-black uppercase text-[var(--primary)]">${t.time}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSettingsView(container) {
+            container.innerHTML = `
+                <div class="space-y-6">
+                    <div class="card p-8">
+                        <h3 class="font-extrabold text-gray-900 mb-2">Notifications</h3>
+                        <p class="text-xs text-gray-400 mb-6 leading-relaxed">OmniTask needs permission to alert you about upcoming deadlines.</p>
+                        <button onclick="requestPermissions()" class="w-full py-4 bg-gray-50 text-gray-600 rounded-3xl text-xs font-black uppercase tracking-widest active:scale-95 transition-all">Setup Alerts</button>
+                    </div>
+                    <div class="card p-8 border-red-50">
+                        <h3 class="font-extrabold text-red-600 mb-2">Reset Engine</h3>
+                        <p class="text-xs text-gray-400 mb-6 leading-relaxed">This will erase all local storage and reset your productivity history.</p>
+                        <button onclick="wipeData()" class="w-full py-4 bg-red-50 text-red-600 rounded-3xl text-xs font-black uppercase tracking-widest active:scale-95 transition-all">Clear All History</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Logic Operations ---
+        function toggleCompletion(id) {
+            const task = state.tasks.find(t => t.id === id);
+            if (task) task.completed = !task.completed;
+            saveState();
+        }
+
+        function removeTask(id) {
+            if (confirm('Permanently delete this task?')) {
+                state.tasks = state.tasks.filter(t => t.id !== id);
+                saveState();
+            }
+        }
+
+        function wipeData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
+                state.tasks = [];
+                saveState();
+                switchView('today');
+            }
+        }
+
+        function requestPermissions() {
+            if ("Notification" in window) {
+                Notification.requestPermission().then(permission => {
+                    alert('System: Notification permission is ' + permission);
+                });
+            } else {
+                alert('System: This device does not support standard web notifications.');
+            }
+        }
+
+        function openModal() {
+            document.getElementById('taskModal').classList.remove('hidden');
+            document.getElementById('date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('modalTitle').innerText = `Add ${state.mode === 'STUDY' ? 'Session' : 'Workflow'}`;
+        }
+
+        function closeModal() {
+            document.getElementById('taskModal').classList.add('hidden');
+            document.getElementById('taskForm').reset();
+        }
+
+        document.getElementById('taskForm').onsubmit = (e) => {
+            e.preventDefault();
+            const task = {
+                id: 'task_' + Date.now(),
+                mode: state.mode,
+                title: document.getElementById('title').value,
+                subject: state.mode === 'STUDY' ? document.getElementById('subject').value : null,
+                details: document.getElementById('details').value,
+                date: document.getElementById('date').value,
+                time: document.getElementById('time').value,
+                duration: state.mode === 'STUDY' ? document.getElementById('duration').value : null,
+                completed: false
+            };
+            state.tasks.push(task);
+            saveState();
+            closeModal();
+        };
+
+        // --- Notification Logic ---
+        function runHeartbeat() {
+            const now = new Date();
+            const todayStr = now.toISOString().split('T')[0];
+
+            state.tasks.forEach(task => {
+                if (task.completed || task.date !== todayStr || state.notified.has(task.id)) return;
+
+                const [h, m] = task.time.split(':');
+                const taskTime = new Date();
+                taskTime.setHours(parseInt(h), parseInt(m), 0, 0);
+                
+                const diffMs = taskTime - now;
+                const diffMins = Math.floor(diffMs / 60000);
+
+                let shouldAlert = false;
+                let alertMessage = '';
+
+                if (task.mode === 'STUDY') {
+                    // Start notification: Exact time
+                    if (diffMins === 0) {
+                        shouldAlert = true;
+                        alertMessage = `STUDY ALERT: ${task.title} starts now!`;
+                    }
+                } else {
+                    // Work notification: 10 mins before
+                    if (diffMins === 10) {
+                        shouldAlert = true;
+                        alertMessage = `WORK REMINDER: ${task.title} in 10 minutes.`;
+                    }
+                }
+
+                if (shouldAlert) {
+                    state.notified.add(task.id);
+                    if ("Notification" in window && Notification.permission === "granted") {
+                        new Notification("OmniTask", { body: alertMessage });
+                    } else {
+                        alert(`🔔 ${alertMessage}`);
+                    }
+                }
+            });
+        }
+
+        // Initialize App
+        document.body.setAttribute('data-mode', state.mode);
+        setInterval(runHeartbeat, 20000); // Check every 20 seconds
+        updateUI();
+    </script>
+</body>
+</html>
