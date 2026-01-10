@@ -104,6 +104,8 @@
         }
         #taskModal .modal-content {
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 90vh;
+            overflow-y: auto;
         }
         #taskModal.hidden {
             display: none;
@@ -132,17 +134,38 @@
         .animate-item {
             animation: fadeIn 0.4s ease-out forwards;
         }
+
+        #inAppNotify {
+            transform: translateY(-150%);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #inAppNotify.show {
+            transform: translateY(0);
+        }
     </style>
 <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@^19.2.3",
-    "react/": "https://esm.sh/react@^19.2.3/"
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3"
   }
 }
 </script>
 </head>
 <body data-mode="STUDY">
+
+    <!-- In-App Notification Banner -->
+    <div id="inAppNotify" class="fixed top-6 left-6 right-6 z-[100] bg-gray-900 text-white p-5 rounded-[24px] shadow-2xl flex items-center gap-4 border border-white/10">
+        <div class="w-10 h-10 rounded-full bg-[var(--primary)] flex items-center justify-center shrink-0">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="flex-1">
+            <p id="notifyText" class="text-sm font-bold leading-tight"></p>
+        </div>
+        <button onclick="hideInAppNotification()" class="p-2 opacity-50 hover:opacity-100 transition-opacity">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2.5"/></svg>
+        </button>
+    </div>
 
     <!-- App Header -->
     <header class="pt-10 px-6 pb-6 sticky top-0 bg-inherit z-40 backdrop-blur-md">
@@ -218,6 +241,7 @@
                     <input id="title" required type="text" class="w-full px-6 py-4 rounded-3xl bg-gray-50 border-none focus:ring-4 focus:ring-[var(--primary)]/10 text-gray-900 font-semibold" placeholder="What's next?">
                 </div>
                 
+                <!-- Study-Specific Context (Shared logic with details) -->
                 <div id="studyFields" class="space-y-5">
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Context / Subject</label>
@@ -236,11 +260,13 @@
                     </div>
                 </div>
 
+                <!-- Study-Specific Interval -->
                 <div id="durationField" class="space-y-2">
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Interval (minutes)</label>
                     <input id="duration" type="number" class="w-full px-6 py-4 rounded-3xl bg-gray-50 border-none focus:ring-4 focus:ring-[var(--primary)]/10 text-gray-900 font-semibold" value="60">
                 </div>
 
+                <!-- Shared Details Field (Same for both modes now) -->
                 <div class="space-y-2 pb-4">
                     <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Brief Details</label>
                     <textarea id="details" class="w-full px-6 py-4 rounded-3xl bg-gray-50 border-none focus:ring-4 focus:ring-[var(--primary)]/10 text-gray-900 font-semibold" rows="2" placeholder="Optional notes..."></textarea>
@@ -266,6 +292,15 @@
             WORK: { primary: '#4f46e5', title: 'Work Suite', sub: 'Production Hub', color: 'indigo', btn: 'Go Study' }
         };
 
+        // Service Worker Registration for APK support
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(() => {
+                console.log('OmniTask Service Worker Registered');
+            }).catch(err => {
+                console.warn('Service Worker Registration Failed:', err);
+            });
+        }
+
         // --- View Handlers ---
         function toggleMode() {
             state.mode = state.mode === 'STUDY' ? 'WORK' : 'STUDY';
@@ -284,13 +319,18 @@
             const tabIds = ['tabToday', 'tabCalendar', 'tabSettings'];
             tabIds.forEach(id => {
                 const el = document.getElementById(id);
-                el.classList.remove('active-tab', 'text-gray-900');
-                el.classList.add('text-gray-300');
+                if (el) {
+                    el.classList.remove('active-tab', 'text-gray-900');
+                    el.classList.add('text-gray-300');
+                }
             });
             
             const activeId = 'tab' + view.charAt(0).toUpperCase() + view.slice(1);
-            document.getElementById(activeId).classList.add('active-tab', 'text-gray-900');
-            document.getElementById(activeId).classList.remove('text-gray-300');
+            const activeEl = document.getElementById(activeId);
+            if (activeEl) {
+                activeEl.classList.add('active-tab', 'text-gray-900');
+                activeEl.classList.remove('text-gray-300');
+            }
             
             updateUI();
         }
@@ -302,6 +342,10 @@
             document.getElementById('toggleText').innerText = theme.btn;
             document.getElementById('modeIcon').style.backgroundColor = theme.primary;
             
+            // Sync Body Color (Mobile Address Bar)
+            const metaTheme = document.querySelector('meta[name="theme-color"]');
+            if (metaTheme) metaTheme.setAttribute('content', theme.primary);
+
             // Toggle form field visibility based on mode
             const isStudy = state.mode === 'STUDY';
             document.getElementById('studyFields').style.display = isStudy ? 'block' : 'none';
@@ -321,6 +365,7 @@
 
         function renderContent() {
             const container = document.getElementById('viewContainer');
+            if (!container) return;
             container.innerHTML = '';
 
             if (state.currentView === 'today') {
@@ -450,7 +495,7 @@
                 <div class="space-y-6 animate-item">
                     <div class="card p-8">
                         <h3 class="font-extrabold text-gray-900 mb-2">Notifications</h3>
-                        <p class="text-xs text-gray-400 mb-6 leading-relaxed">System relies on browser background permissions to fire triggers precisely.</p>
+                        <p class="text-xs text-gray-400 mb-6 leading-relaxed">System fires triggers precisely 5 minutes before scheduled time.</p>
                         <button onclick="requestAlerts()" class="w-full py-4 bg-gray-50 text-gray-600 rounded-3xl text-xs font-black uppercase tracking-widest active:scale-95 transition-all">Enable System Alerts</button>
                     </div>
                     <div class="card p-8 border-red-50">
@@ -459,7 +504,7 @@
                         <button onclick="clearAllData()" class="w-full py-4 bg-red-50 text-red-600 rounded-3xl text-xs font-black uppercase tracking-widest active:scale-95 transition-all">Format All Data</button>
                     </div>
                     <div class="text-center pt-8 opacity-20">
-                        <p class="text-[10px] font-black uppercase tracking-[0.3em]">OmniTask v1.0 • Mobile Optimized</p>
+                        <p class="text-[10px] font-black uppercase tracking-[0.3em]">OmniTask v1.1 • APK Optimized</p>
                     </div>
                 </div>
             `;
@@ -490,7 +535,11 @@
         function requestAlerts() {
             if ("Notification" in window) {
                 Notification.requestPermission().then(p => {
-                    alert('System Notification status: ' + p);
+                    if (p === 'granted') {
+                        alert('System Notification Enabled!');
+                    } else {
+                        alert('Permission status: ' + p);
+                    }
                 });
             } else {
                 alert('Device does not support standard web alerts.');
@@ -526,7 +575,26 @@
             closeModal();
         };
 
+        // --- In-App Notification Logic ---
+        function showInAppNotification(text) {
+            const banner = document.getElementById('inAppNotify');
+            const textEl = document.getElementById('notifyText');
+            textEl.innerText = text;
+            banner.classList.add('show');
+            
+            // Vibration for Android APK feel
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+
+            // Auto-hide after 10s
+            setTimeout(hideInAppNotification, 10000);
+        }
+
+        function hideInAppNotification() {
+            document.getElementById('inAppNotify').classList.remove('show');
+        }
+
         // --- Heartbeat Engine (Notifications) ---
+        // Unified Logic: Fired 5 minutes before for BOTH modes
         function runHeartbeat() {
             const now = new Date();
             const todayStr = now.toISOString().split('T')[0];
@@ -541,31 +609,23 @@
                 const diffMs = taskTime - now;
                 const diffMins = Math.floor(diffMs / 60000);
 
-                let fire = false;
-                let msg = '';
-
-                if (task.mode === 'STUDY') {
-                    // Fire at exact time
-                    if (diffMins === 0) {
-                        fire = true;
-                        msg = `Time for ${task.title}!`;
-                    }
-                } else {
-                    // Fire 10 mins before
-                    if (diffMins === 10) {
-                        fire = true;
-                        msg = `${task.title} starts in 10 minutes.`;
-                    }
-                }
-
-                if (fire) {
+                // Check for "5 minutes before" exactly
+                if (diffMins === 5) {
                     state.notified.add(task.id);
+                    const msg = `Upcoming: ${task.title} in 5 minutes!`;
+                    
+                    // 1. Try System Notification (best for background)
                     if ("Notification" in window && Notification.permission === "granted") {
-                        new Notification("OmniTask Alert", { body: msg });
-                    } else {
-                        // High visibility fallback alert
-                        alert(`🔔 ${msg}`);
+                        try {
+                            new Notification("OmniTask Reminder", { 
+                                body: msg,
+                                icon: 'https://cdn-icons-png.flaticon.com/512/2098/2098402.png'
+                            });
+                        } catch(e) { console.error('Notify fail:', e); }
                     }
+                    
+                    // 2. Fallback to In-App Banner + Vibration
+                    showInAppNotification(msg);
                 }
             });
         }
