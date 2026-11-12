@@ -1,1048 +1,603 @@
 <!DOCTYPE html>
-<html lang="en"><head>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Candidate Skill Assessment Portal</title>
-    <!-- Tailwind CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Web-to-APK & Fullscreen Mobile App Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#38bdf8">
+    <title>Toddler Bubble Pop</title>
+    <!-- Load Tailwind CSS for responsive layout -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#f0f7ff',
-                            100: '#e0effe',
-                            500: '#2563eb',
-                            600: '#1d4ed8',
-                            700: '#1e40af',
-                            900: '#1e3a8a'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <!-- Load Tone.js for gentle, cheerful musical chimes -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <!-- Load Fredoka font for big, friendly letters -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&display=swap" rel="stylesheet">
+    
     <style>
-        /* Custom scrollbars and high contrast highlight */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+        /* Prevent scrolling, zooming, or accidental text selection for little fingers */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(180deg, #bae6fd 0%, #e0f2fe 50%, #dcfce7 100%);
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-        .excel-cell:focus {
-            outline: 2px solid #2563eb;
-            z-index: 10;
-        }
-        .highlight-cell {
-            background-color: #fef08a !important;
-            border: 2px solid #ca8a04 !important;
-        }
-        .correct-char {
-            color: #16a34a;
-            background-color: #dcfce7;
-        }
-        .incorrect-char {
-            color: #dc2626;
-            background-color: #fee2e2;
-            text-decoration: underline;
-        }
-        .current-char {
-            background-color: #93c5fd;
-            animation: pulse 1s infinite;
-        }
-    </style>
-<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Inter, sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.fixed{position:fixed}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0px}.top-0{top:0px}.top-16{top:4rem}.z-30{z-index:30}.z-40{z-index:40}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.my-3{margin-top:0.75rem;margin-bottom:0.75rem}.my-6{margin-top:1.5rem;margin-bottom:1.5rem}.mb-0\.5{margin-bottom:0.125rem}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.ml-2{margin-left:0.5rem}.mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}.mt-3{margin-top:0.75rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-16{height:4rem}.h-3{height:0.75rem}.h-40{height:10rem}.h-\[460px\]{height:460px}.min-h-screen{min-height:100vh}.w-1\/5{width:20%}.w-12{width:3rem}.w-3{width:0.75rem}.w-full{width:100%}.max-w-7xl{max-width:80rem}.max-w-md{max-width:28rem}.max-w-xl{max-width:36rem}.flex-grow{flex-grow:1}.border-collapse{border-collapse:collapse}.cursor-pointer{cursor:pointer}.select-none{-webkit-user-select:none;user-select:none}.resize-none{resize:none}.list-inside{list-style-position:inside}.list-disc{list-style-type:disc}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1{gap:0.25rem}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.gap-8{gap:2rem}.space-x-1 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.25rem * var(--tw-space-x-reverse));margin-left:calc(0.25rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-2 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-3 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.75rem * var(--tw-space-x-reverse));margin-left:calc(0.75rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-4 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1rem * var(--tw-space-x-reverse));margin-left:calc(1rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-6 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1.5rem * var(--tw-space-x-reverse));margin-left:calc(1.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-1\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.375rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.375rem * var(--tw-space-y-reverse))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.25rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.whitespace-nowrap{white-space:nowrap}.rounded{border-radius:0.25rem}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-xl{border-radius:0.75rem}.rounded-r-lg{border-top-right-radius:0.5rem;border-bottom-right-radius:0.5rem}.border{border-width:1px}.border-2{border-width:2px}.border-b{border-bottom-width:1px}.border-b-2{border-bottom-width:2px}.border-l-4{border-left-width:4px}.border-r{border-right-width:1px}.border-t{border-top-width:1px}.border-amber-200{--tw-border-opacity:1;border-color:rgb(253 230 138 / var(--tw-border-opacity, 1))}.border-blue-200{--tw-border-opacity:1;border-color:rgb(191 219 254 / var(--tw-border-opacity, 1))}.border-brand-600{--tw-border-opacity:1;border-color:rgb(29 78 216 / var(--tw-border-opacity, 1))}.border-emerald-200{--tw-border-opacity:1;border-color:rgb(167 243 208 / var(--tw-border-opacity, 1))}.border-red-200{--tw-border-opacity:1;border-color:rgb(254 202 202 / var(--tw-border-opacity, 1))}.border-slate-100{--tw-border-opacity:1;border-color:rgb(241 245 249 / var(--tw-border-opacity, 1))}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240 / var(--tw-border-opacity, 1))}.border-slate-300{--tw-border-opacity:1;border-color:rgb(203 213 225 / var(--tw-border-opacity, 1))}.border-slate-700{--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.border-slate-800{--tw-border-opacity:1;border-color:rgb(30 41 59 / var(--tw-border-opacity, 1))}.border-transparent{border-color:transparent}.border-emerald-700{--tw-border-opacity:1;border-color:rgb(4 120 87 / var(--tw-border-opacity, 1))}.border-red-300{--tw-border-opacity:1;border-color:rgb(252 165 165 / var(--tw-border-opacity, 1))}.bg-amber-100{--tw-bg-opacity:1;background-color:rgb(254 243 199 / var(--tw-bg-opacity, 1))}.bg-amber-50{--tw-bg-opacity:1;background-color:rgb(255 251 235 / var(--tw-bg-opacity, 1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.bg-brand-600{--tw-bg-opacity:1;background-color:rgb(29 78 216 / var(--tw-bg-opacity, 1))}.bg-emerald-50{--tw-bg-opacity:1;background-color:rgb(236 253 245 / var(--tw-bg-opacity, 1))}.bg-emerald-600{--tw-bg-opacity:1;background-color:rgb(5 150 105 / var(--tw-bg-opacity, 1))}.bg-green-500{--tw-bg-opacity:1;background-color:rgb(34 197 94 / var(--tw-bg-opacity, 1))}.bg-red-50{--tw-bg-opacity:1;background-color:rgb(254 242 242 / var(--tw-bg-opacity, 1))}.bg-red-500{--tw-bg-opacity:1;background-color:rgb(239 68 68 / var(--tw-bg-opacity, 1))}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.bg-slate-200{--tw-bg-opacity:1;background-color:rgb(226 232 240 / var(--tw-bg-opacity, 1))}.bg-slate-300{--tw-bg-opacity:1;background-color:rgb(203 213 225 / var(--tw-bg-opacity, 1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.bg-slate-800{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.bg-slate-900{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-slate-900\/60{background-color:rgb(15 23 42 / 0.6)}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-yellow-500{--tw-bg-opacity:1;background-color:rgb(234 179 8 / var(--tw-bg-opacity, 1))}.bg-emerald-800{--tw-bg-opacity:1;background-color:rgb(6 95 70 / var(--tw-bg-opacity, 1))}.bg-red-100{--tw-bg-opacity:1;background-color:rgb(254 226 226 / var(--tw-bg-opacity, 1))}.bg-emerald-100{--tw-bg-opacity:1;background-color:rgb(209 250 229 / var(--tw-bg-opacity, 1))}.p-2{padding:0.5rem}.p-2\.5{padding:0.625rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-12{padding-top:3rem;padding-bottom:3rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.pb-3{padding-bottom:0.75rem}.pb-4{padding-bottom:1rem}.pr-1{padding-right:0.25rem}.pt-2{padding-top:0.5rem}.pt-3{padding-top:0.75rem}.text-left{text-align:left}.text-center{text-align:center}.text-right{text-align:right}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.font-sans{font-family:Inter, sans-serif}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-relaxed{line-height:1.625}.leading-tight{line-height:1.25}.tracking-wide{letter-spacing:0.025em}.tracking-wider{letter-spacing:0.05em}.tracking-widest{letter-spacing:0.1em}.text-amber-400{--tw-text-opacity:1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}.text-amber-500{--tw-text-opacity:1;color:rgb(245 158 11 / var(--tw-text-opacity, 1))}.text-amber-600{--tw-text-opacity:1;color:rgb(217 119 6 / var(--tw-text-opacity, 1))}.text-amber-700{--tw-text-opacity:1;color:rgb(180 83 9 / var(--tw-text-opacity, 1))}.text-amber-800{--tw-text-opacity:1;color:rgb(146 64 14 / var(--tw-text-opacity, 1))}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.text-blue-900{--tw-text-opacity:1;color:rgb(30 58 138 / var(--tw-text-opacity, 1))}.text-brand-500{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-brand-600{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.text-brand-900{--tw-text-opacity:1;color:rgb(30 58 138 / var(--tw-text-opacity, 1))}.text-emerald-500{--tw-text-opacity:1;color:rgb(16 185 129 / var(--tw-text-opacity, 1))}.text-emerald-600{--tw-text-opacity:1;color:rgb(5 150 105 / var(--tw-text-opacity, 1))}.text-emerald-700{--tw-text-opacity:1;color:rgb(4 120 87 / var(--tw-text-opacity, 1))}.text-emerald-800{--tw-text-opacity:1;color:rgb(6 95 70 / var(--tw-text-opacity, 1))}.text-red-700{--tw-text-opacity:1;color:rgb(185 28 28 / var(--tw-text-opacity, 1))}.text-slate-100{--tw-text-opacity:1;color:rgb(241 245 249 / var(--tw-text-opacity, 1))}.text-slate-200{--tw-text-opacity:1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-emerald-200{--tw-text-opacity:1;color:rgb(167 243 208 / var(--tw-text-opacity, 1))}.shadow{--tw-shadow:0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-inner{--tw-shadow:inset 0 2px 4px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:inset 0 2px 4px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:bg-brand-700:hover{--tw-bg-opacity:1;background-color:rgb(30 64 175 / var(--tw-bg-opacity, 1))}.hover\:bg-emerald-700:hover{--tw-bg-opacity:1;background-color:rgb(4 120 87 / var(--tw-bg-opacity, 1))}.hover\:bg-red-100:hover{--tw-bg-opacity:1;background-color:rgb(254 226 226 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-300:hover{--tw-bg-opacity:1;background-color:rgb(203 213 225 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-50:hover{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-700:hover{--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-800:hover{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.hover\:text-slate-600:hover{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.hover\:text-slate-700:hover{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.focus\:border-brand-500:focus{--tw-border-opacity:1;border-color:rgb(37 99 235 / var(--tw-border-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-0:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-1:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-brand-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(37 99 235 / var(--tw-ring-opacity, 1))}.disabled\:cursor-not-allowed:disabled{cursor:not-allowed}.disabled\:bg-slate-50:disabled{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}@media (min-width: 640px){.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}}@media (min-width: 768px){.md\:flex{display:flex}.md\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.md\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}.md\:flex-row{flex-direction:row}.md\:items-center{align-items:center}}@media (min-width: 1024px){.lg\:col-span-2{grid-column:span 2 / span 2}.lg\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.lg\:px-8{padding-left:2rem;padding-right:2rem}}</style><style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Inter, sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.fixed{position:fixed}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0px}.top-0{top:0px}.top-16{top:4rem}.z-30{z-index:30}.z-40{z-index:40}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.my-3{margin-top:0.75rem;margin-bottom:0.75rem}.my-6{margin-top:1.5rem;margin-bottom:1.5rem}.mb-0\.5{margin-bottom:0.125rem}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.ml-2{margin-left:0.5rem}.mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}.mt-3{margin-top:0.75rem}.mt-4{margin-top:1rem}.mt-6{margin-top:1.5rem}.block{display:block}.inline-block{display:inline-block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-16{height:4rem}.h-3{height:0.75rem}.h-40{height:10rem}.h-\[460px\]{height:460px}.min-h-screen{min-height:100vh}.w-1\/5{width:20%}.w-12{width:3rem}.w-3{width:0.75rem}.w-full{width:100%}.max-w-7xl{max-width:80rem}.max-w-md{max-width:28rem}.max-w-xl{max-width:36rem}.flex-grow{flex-grow:1}.border-collapse{border-collapse:collapse}.cursor-pointer{cursor:pointer}.select-none{-webkit-user-select:none;user-select:none}.resize-none{resize:none}.list-inside{list-style-position:inside}.list-disc{list-style-type:disc}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-start{align-items:flex-start}.items-center{align-items:center}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1{gap:0.25rem}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.gap-8{gap:2rem}.space-x-1 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.25rem * var(--tw-space-x-reverse));margin-left:calc(0.25rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-2 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-3 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.75rem * var(--tw-space-x-reverse));margin-left:calc(0.75rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-4 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1rem * var(--tw-space-x-reverse));margin-left:calc(1rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-6 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(1.5rem * var(--tw-space-x-reverse));margin-left:calc(1.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-1\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.375rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.375rem * var(--tw-space-y-reverse))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.25rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.whitespace-nowrap{white-space:nowrap}.rounded{border-radius:0.25rem}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-xl{border-radius:0.75rem}.rounded-r-lg{border-top-right-radius:0.5rem;border-bottom-right-radius:0.5rem}.border{border-width:1px}.border-2{border-width:2px}.border-b{border-bottom-width:1px}.border-b-2{border-bottom-width:2px}.border-l-4{border-left-width:4px}.border-r{border-right-width:1px}.border-t{border-top-width:1px}.border-amber-200{--tw-border-opacity:1;border-color:rgb(253 230 138 / var(--tw-border-opacity, 1))}.border-brand-600{--tw-border-opacity:1;border-color:rgb(29 78 216 / var(--tw-border-opacity, 1))}.border-emerald-200{--tw-border-opacity:1;border-color:rgb(167 243 208 / var(--tw-border-opacity, 1))}.border-emerald-700{--tw-border-opacity:1;border-color:rgb(4 120 87 / var(--tw-border-opacity, 1))}.border-red-200{--tw-border-opacity:1;border-color:rgb(254 202 202 / var(--tw-border-opacity, 1))}.border-slate-100{--tw-border-opacity:1;border-color:rgb(241 245 249 / var(--tw-border-opacity, 1))}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240 / var(--tw-border-opacity, 1))}.border-slate-300{--tw-border-opacity:1;border-color:rgb(203 213 225 / var(--tw-border-opacity, 1))}.border-slate-700{--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.border-slate-800{--tw-border-opacity:1;border-color:rgb(30 41 59 / var(--tw-border-opacity, 1))}.border-transparent{border-color:transparent}.bg-amber-100{--tw-bg-opacity:1;background-color:rgb(254 243 199 / var(--tw-bg-opacity, 1))}.bg-amber-50{--tw-bg-opacity:1;background-color:rgb(255 251 235 / var(--tw-bg-opacity, 1))}.bg-blue-50{--tw-bg-opacity:1;background-color:rgb(239 246 255 / var(--tw-bg-opacity, 1))}.bg-brand-600{--tw-bg-opacity:1;background-color:rgb(29 78 216 / var(--tw-bg-opacity, 1))}.bg-emerald-100{--tw-bg-opacity:1;background-color:rgb(209 250 229 / var(--tw-bg-opacity, 1))}.bg-emerald-50{--tw-bg-opacity:1;background-color:rgb(236 253 245 / var(--tw-bg-opacity, 1))}.bg-emerald-600{--tw-bg-opacity:1;background-color:rgb(5 150 105 / var(--tw-bg-opacity, 1))}.bg-emerald-800{--tw-bg-opacity:1;background-color:rgb(6 95 70 / var(--tw-bg-opacity, 1))}.bg-green-500{--tw-bg-opacity:1;background-color:rgb(34 197 94 / var(--tw-bg-opacity, 1))}.bg-red-50{--tw-bg-opacity:1;background-color:rgb(254 242 242 / var(--tw-bg-opacity, 1))}.bg-red-500{--tw-bg-opacity:1;background-color:rgb(239 68 68 / var(--tw-bg-opacity, 1))}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.bg-slate-200{--tw-bg-opacity:1;background-color:rgb(226 232 240 / var(--tw-bg-opacity, 1))}.bg-slate-300{--tw-bg-opacity:1;background-color:rgb(203 213 225 / var(--tw-bg-opacity, 1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.bg-slate-800{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.bg-slate-900{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-slate-900\/60{background-color:rgb(15 23 42 / 0.6)}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-yellow-500{--tw-bg-opacity:1;background-color:rgb(234 179 8 / var(--tw-bg-opacity, 1))}.p-2{padding:0.5rem}.p-2\.5{padding:0.625rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-12{padding-top:3rem;padding-bottom:3rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.pb-3{padding-bottom:0.75rem}.pb-4{padding-bottom:1rem}.pr-1{padding-right:0.25rem}.pt-2{padding-top:0.5rem}.pt-3{padding-top:0.75rem}.text-left{text-align:left}.text-center{text-align:center}.text-right{text-align:right}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.font-sans{font-family:Inter, sans-serif}.text-2xl{font-size:1.5rem;line-height:2rem}.text-3xl{font-size:1.875rem;line-height:2.25rem}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-relaxed{line-height:1.625}.leading-tight{line-height:1.25}.tracking-wide{letter-spacing:0.025em}.tracking-wider{letter-spacing:0.05em}.tracking-widest{letter-spacing:0.1em}.text-amber-400{--tw-text-opacity:1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}.text-amber-500{--tw-text-opacity:1;color:rgb(245 158 11 / var(--tw-text-opacity, 1))}.text-amber-600{--tw-text-opacity:1;color:rgb(217 119 6 / var(--tw-text-opacity, 1))}.text-amber-700{--tw-text-opacity:1;color:rgb(180 83 9 / var(--tw-text-opacity, 1))}.text-amber-800{--tw-text-opacity:1;color:rgb(146 64 14 / var(--tw-text-opacity, 1))}.text-blue-600{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.text-brand-500{--tw-text-opacity:1;color:rgb(37 99 235 / var(--tw-text-opacity, 1))}.text-brand-600{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.text-brand-900{--tw-text-opacity:1;color:rgb(30 58 138 / var(--tw-text-opacity, 1))}.text-emerald-200{--tw-text-opacity:1;color:rgb(167 243 208 / var(--tw-text-opacity, 1))}.text-emerald-500{--tw-text-opacity:1;color:rgb(16 185 129 / var(--tw-text-opacity, 1))}.text-emerald-600{--tw-text-opacity:1;color:rgb(5 150 105 / var(--tw-text-opacity, 1))}.text-emerald-700{--tw-text-opacity:1;color:rgb(4 120 87 / var(--tw-text-opacity, 1))}.text-emerald-800{--tw-text-opacity:1;color:rgb(6 95 70 / var(--tw-text-opacity, 1))}.text-red-700{--tw-text-opacity:1;color:rgb(185 28 28 / var(--tw-text-opacity, 1))}.text-slate-100{--tw-text-opacity:1;color:rgb(241 245 249 / var(--tw-text-opacity, 1))}.text-slate-200{--tw-text-opacity:1;color:rgb(226 232 240 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.shadow{--tw-shadow:0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-inner{--tw-shadow:inset 0 2px 4px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:inset 0 2px 4px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:bg-brand-700:hover{--tw-bg-opacity:1;background-color:rgb(30 64 175 / var(--tw-bg-opacity, 1))}.hover\:bg-emerald-700:hover{--tw-bg-opacity:1;background-color:rgb(4 120 87 / var(--tw-bg-opacity, 1))}.hover\:bg-red-100:hover{--tw-bg-opacity:1;background-color:rgb(254 226 226 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-300:hover{--tw-bg-opacity:1;background-color:rgb(203 213 225 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-50:hover{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-700:hover{--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-800:hover{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.hover\:text-slate-600:hover{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.hover\:text-slate-700:hover{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.focus\:border-brand-500:focus{--tw-border-opacity:1;border-color:rgb(37 99 235 / var(--tw-border-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-0:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-1:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-brand-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(37 99 235 / var(--tw-ring-opacity, 1))}.disabled\:cursor-not-allowed:disabled{cursor:not-allowed}.disabled\:bg-slate-50:disabled{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}@media (min-width: 640px){.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}}@media (min-width: 768px){.md\:flex{display:flex}.md\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.md\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}.md\:flex-row{flex-direction:row}.md\:items-center{align-items:center}}@media (min-width: 1024px){.lg\:col-span-2{grid-column:span 2 / span 2}.lg\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.lg\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.lg\:px-8{padding-left:2rem;padding-right:2rem}}</style></head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
 
-    <!-- Navigation Header -->
-    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="bg-brand-600 p-2 rounded-lg text-white">
-                    <i class="fa-solid fa-clipboard-check text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="font-bold text-lg leading-tight">AssessPro Portal</h1>
-                    <p class="text-xs text-slate-400">Candidate Technical Evaluation System</p>
-                </div>
-            </div>
+        /* Fullscreen interactive canvas */
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
 
-            <!-- Global Test Progress Indicator -->
-            <div class="hidden md:flex items-center space-x-6">
-                <div class="flex items-center space-x-2 text-xs">
-                    <span class="text-slate-400">System Log:</span>
-                    <span id="badge-webmail-status" class="px-2 py-0.5 rounded-full bg-emerald-800 text-emerald-200 border border-emerald-700">Pending (0/5)</span>
-                </div>
-                <div class="flex items-center space-x-2 text-xs">
-                    <span class="text-slate-400">Typing Standard:</span>
-                    <span id="badge-typing-status" class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">12 WPM</span>
-                </div>
-                <div class="flex items-center space-x-2 text-xs">
-                    <span class="text-slate-400">Excel Test:</span>
-                    <span id="badge-excel-status" class="px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">4/5 Marks</span>
-                </div>
-            </div>
-
-            <div class="flex items-center space-x-3">
-                <button onclick="openAdminModal()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded-md border border-slate-700 transition flex items-center space-x-2">
-                    <i class="fa-solid fa-user-shield"></i>
-                    <span>Admin Login</span>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Navigation Tabs -->
-    <nav class="bg-white border-b border-slate-200 shadow-sm sticky top-16 z-30">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex overflow-x-auto">
-            <button onclick="switchTab('tab-webmail')" id="btn-tab-webmail" class="tab-btn active border-b-2 font-medium text-sm py-4 px-6 flex items-center space-x-2 whitespace-nowrap border-transparent text-slate-500">
-                <i class="fa-solid fa-envelope"></i>
-                <span>1. Webmail &amp; OTP Test (5 Marks)</span>
+        /* Gentle bounce for the sun and clouds */
+        @keyframes slowFloat {
+            0%, 100% { transform: translateY(0px); }
+        /* Sound Toggle Button (Large target for parents) */
+        <div class="flex items-center gap-2 pointer-events-auto">
+            <button id="soundBtn" onclick="toggleSound(event)" class="bg-white/90 active:scale-90 transition-transform p-3 rounded-full shadow-lg border-4 border-sky-300 text-2xl sm:text-3xl" aria-label="Toggle Sound">
+                🔊
             </button>
-            <button onclick="switchTab('tab-typing')" id="btn-tab-typing" class="tab-btn border-b-2 hover:text-slate-700 font-medium text-sm py-4 px-6 flex items-center space-x-2 whitespace-nowrap border-transparent text-slate-500">
-                <i class="fa-solid fa-keyboard"></i>
-                <span>2. Typing Speed Test</span>
-            </button>
-            <button onclick="switchTab('tab-excel')" id="btn-tab-excel" class="tab-btn border-b-2 hover:text-slate-700 font-medium text-sm py-4 px-6 flex items-center space-x-2 whitespace-nowrap border-brand-600 text-brand-600">
-                <i class="fa-solid fa-file-excel"></i>
-                <span>3. Basic Excel Test (5 Marks)</span>
-            </button>
-            <button onclick="switchTab('tab-dashboard')" id="btn-tab-dashboard" class="tab-btn border-b-2 border-transparent text-slate-500 hover:text-slate-700 font-medium text-sm py-4 px-6 flex items-center space-x-2 whitespace-nowrap">
-                <i class="fa-solid fa-chart-pie"></i>
-                <span>4. Score Dashboard</span>
+            <!-- Parent-Only Hold-to-Exit Lock Button -->
+            <button id="exitLockBtn" 
+                onmousedown="startExitHold(event)" 
+                onmouseup="cancelExitHold(event)" 
+                onmouseleave="cancelExitHold(event)"
+                ontouchstart="startExitHold(event)" 
+                ontouchend="cancelExitHold(event)"
+                ontouchcancel="cancelExitHold(event)"
+                class="relative overflow-hidden bg-rose-500 text-white font-bold px-4 py-3 rounded-full shadow-lg border-4 border-rose-300 text-sm sm:text-base select-none" 
+                aria-label="Hold 3 seconds to Exit Lock">
+                <span id="exitProgress" class="absolute inset-0 bg-rose-800/60 w-0 pointer-events-none transition-none"></span>
+                <span class="relative z-10 flex items-center gap-1">🔒 Hold to Exit</span>
             </button>
         </div>
-    </nav>
+    </div>
 
-    <!-- Main Container -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- Subtle Parent Toast Message (Replaces browser alerts) -->
+    <div id="parentToast" class="fixed top-20 left-1/2 -translate-x-1/2 bg-slate-900/90 text-white px-5 py-2.5 rounded-full text-sm sm:text-base font-bold shadow-xl opacity-0 pointer-events-none transition-opacity duration-300 z-30 text-center max-w-[90vw]">
+        Hold "Exit" for 3 seconds to unlock
+    </div>
 
-        <!-- TAB 1: WEBMAIL & OTP TEST -->
-        <section id="tab-webmail" class="tab-content block space-y-6 hidden">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-100 gap-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-shield-halved text-brand-600"></i>
-                            System Authentication &amp; Webmail Verification Test
-                        </h2>
-                        <p class="text-sm text-slate-500">Log in using the simulated credentials and complete OTP verification to earn <strong>5 Marks</strong>.</p>
-                    </div>
-                    <div id="webmail-score-card" class="bg-amber-50 border border-amber-200 px-4 py-2 rounded-lg text-right">
-                        <span class="text-xs text-amber-700 font-medium block">Verification Marks</span>
-                        <span id="webmail-score-display" class="text-lg font-bold text-amber-800">0 / 5 Marks</span>
-                    </div>
-                </div>
+    <!-- Main Interactive Play Canvas -->
+    <canvas id="gameCanvas"></canvas>
 
-                <!-- Simulation Workbench -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-6">
-                    <!-- Left: Instructions & Credentials Box -->
-                    <div class="space-y-4">
-                        <div class="bg-blue-50 border-l-4 border-brand-600 p-4 rounded-r-lg">
-                            <h3 class="font-semibold text-brand-900 text-sm flex items-center gap-2">
-                                <i class="fa-solid fa-circle-info"></i> Candidate Instructions
-                            </h3>
-                            <ul class="text-xs text-brand-800 mt-2 space-y-1.5 list-disc list-inside">
-                                <li>Use the test credentials provided below to sign into the simulated Webmail.</li>
-                                <li>Click <strong>Send Verification OTP</strong> to generate an authentication code.</li>
-                                <li>Retrieve the code from your simulated Inbox on the right panel.</li>
-                                <li>Submit the OTP correctly to score your 5 marks.</li>
-                            </ul>
-                        </div>
-
-                        <div class="bg-slate-100 p-4 rounded-lg border border-slate-200">
-                            <h4 class="text-xs uppercase font-bold text-slate-500 tracking-wider mb-2">Test Credentials</h4>
-                            <div class="grid grid-cols-2 gap-4 text-sm">
-                                <div class="bg-white p-2.5 rounded border border-slate-200">
-                                    <span class="text-xs text-slate-400 block">System ID / Email:</span>
-                                    <span class="font-mono font-semibold text-slate-700">candidate@assess.com</span>
-                                </div>
-                                <div class="bg-white p-2.5 rounded border border-slate-200">
-                                    <span class="text-xs text-slate-400 block">Password:</span>
-                                    <span class="font-mono font-semibold text-slate-700">Verify2026!</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Webmail Login Form -->
-                        <div id="webmail-login-card" class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm">
-                            <h3 class="text-md font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                                <i class="fa-solid fa-right-to-bracket text-slate-500"></i>
-                                Webmail Login
-                            </h3>
-                            <form id="form-webmail-login" onsubmit="handleWebmailLogin(event)" class="space-y-4">
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-600 mb-1">System ID / Email</label>
-                                    <input type="email" id="wm-email" required="" placeholder="candidate@assess.com" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-medium text-slate-600 mb-1">Password</label>
-                                    <input type="password" id="wm-password" required="" placeholder="••••••••" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                                </div>
-                                <button type="submit" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm py-2.5 rounded-md transition shadow">
-                                    Sign In &amp; Request OTP
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- OTP Input Form (Initially Hidden) -->
-                        <div id="webmail-otp-card" class="bg-white border border-slate-200 rounded-lg p-5 shadow-sm space-y-4 hidden">
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-md font-semibold text-slate-800 flex items-center gap-2">
-                                    <i class="fa-solid fa-key text-amber-500"></i>
-                                    Enter 2FA Security OTP
-                                </h3>
-                                <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-medium">Step 2 of 2</span>
-                            </div>
-                            <p class="text-xs text-slate-500">Check your simulated Webmail Inbox on the right panel for your 6-digit OTP passcode.</p>
-                            
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1">6-Digit OTP</label>
-                                <input type="text" id="wm-otp-input" maxlength="6" placeholder="e.g. 849201" class="w-full px-3 py-2 text-sm font-mono tracking-widest text-center border border-slate-300 rounded-md focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                            </div>
-                            <button onclick="verifyOTP()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm py-2.5 rounded-md transition shadow flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-check"></i> Validate OTP &amp; Claim Marks
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Right: Simulated Webmail Inbox Client -->
-                    <div class="bg-slate-900 rounded-xl p-4 text-slate-200 border border-slate-800 flex flex-col h-[460px]">
-                        <div class="flex items-center justify-between pb-3 border-b border-slate-800">
-                            <div class="flex items-center space-x-2">
-                                <span class="w-3 h-3 rounded-full bg-red-500"></span>
-                                <span class="w-3 h-3 rounded-full bg-yellow-500"></span>
-                                <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                                <span class="text-xs text-slate-400 font-mono ml-2">Simulated Webmail Inbox</span>
-                            </div>
-                            <span id="wm-inbox-status" class="text-xs text-slate-400 font-mono">Status: New Email Received</span>
-                        </div>
-
-                        <!-- Email List View -->
-                        <div class="flex-grow overflow-y-auto my-3 space-y-2 pr-1">
-                            <div id="wm-email-empty" class="text-center py-12 text-slate-500 text-xs hidden">
-                                <i class="fa-regular fa-envelope-open text-3xl mb-2 block"></i>
-                                Log in on the left to receive authentication messages.
-                            </div>
-
-                            <div id="wm-email-item" class="cursor-pointer bg-slate-800 hover:bg-slate-750 p-3 rounded-lg border border-slate-700 transition">
-                                <div class="flex items-center justify-between text-xs mb-1">
-                                    <span class="font-bold text-brand-400">Security System</span>
-                                    <span class="text-slate-400 text-[10px]">Just Now</span>
-                                </div>
-                                <h4 class="text-xs font-semibold text-slate-100">Your Assessment Verification OTP Code</h4>
-                                <p class="text-[11px] text-slate-400 truncate mt-1">Use OTP: <strong id="wm-otp-display" class="text-amber-400 font-mono text-xs">618113</strong> to complete your skill verification.</p>
-                            </div>
-                        </div>
-
-                        <div class="pt-3 border-t border-slate-800 text-[11px] text-slate-500 flex justify-between">
-                            <span>Box: Inbox (1)</span>
-                            <span>Secure SSL Encrypted</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 2: TYPING SPEED TEST PORTAL -->
-        <section id="tab-typing" class="tab-content space-y-6 hidden">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-100 gap-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-keyboard text-brand-600"></i>
-                            Typing Speed &amp; Accuracy Evaluation
-                        </h2>
-                        <p class="text-sm text-slate-500">Standard candidate requirement is <strong>30 WPM</strong> or higher.</p>
-                    </div>
-
-                    <!-- Prompt Set Selector -->
-                    <div class="flex items-center space-x-2">
-                        <label for="typing-set-select" class="text-xs font-semibold text-slate-600 whitespace-nowrap">Select Set (10 Sets):</label>
-                        <select id="typing-set-select" onchange="loadTypingSet()" class="bg-slate-50 border border-slate-300 text-slate-700 text-xs rounded-lg p-2 focus:ring-brand-500 focus:outline-none">
-                            <option value="0">Set 1: General Office Communication</option>
-                            <option value="1">Set 2: Customer Support Service</option>
-                            <option value="2">Set 3: Data Verification &amp; Invoicing</option>
-                            <option value="3">Set 4: Professional Email Etiquette</option>
-                            <option value="4">Set 5: Technical Network Support</option>
-                            <option value="5">Set 6: Finance &amp; Account Audit</option>
-                            <option value="6">Set 7: HR Operations &amp; Policies</option>
-                            <option value="7">Set 8: Project Planning &amp; Roadmap</option>
-                            <option value="8">Set 9: Supply Chain Logistics</option>
-                            <option value="9">Set 10: Executive Summary Brief</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Live Metrics Dashboard -->
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 my-6">
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
-                        <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Speed (WPM)</span>
-                        <div id="typing-wpm" class="text-3xl font-extrabold text-brand-600 mt-1">0</div>
-                        <span class="text-[10px] text-slate-400">Target: 30 WPM</span>
-                    </div>
-
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
-                        <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Accuracy</span>
-                        <div id="typing-accuracy" class="text-3xl font-extrabold text-emerald-600 mt-1">100%</div>
-                        <span class="text-[10px] text-slate-400">Errors penalized</span>
-                    </div>
-
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
-                        <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Time Left</span>
-                        <div id="typing-timer" class="text-3xl font-extrabold text-amber-600 mt-1">60s</div>
-                        <span class="text-[10px] text-slate-400">Standard 60s window</span>
-                    </div>
-
-                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-center">
-                        <span class="text-xs font-medium text-slate-500 uppercase tracking-wider">Pass Status</span>
-                        <div id="typing-status-badge" class="mt-2 inline-block px-3 py-1 text-xs font-bold rounded-full bg-slate-200 text-slate-600">Not Started</div>
-                    </div>
-                </div>
-
-                <!-- Typing Display Box -->
-                <div class="space-y-4">
-                    <div id="typing-text-display" class="p-5 bg-slate-100 rounded-xl border border-slate-200 text-slate-700 font-mono text-base leading-relaxed tracking-wide h-40 overflow-y-auto select-none"><span id="char-0" class="current-char">E</span><span id="char-1">f</span><span id="char-2">f</span><span id="char-3">e</span><span id="char-4">c</span><span id="char-5">t</span><span id="char-6">i</span><span id="char-7">v</span><span id="char-8">e</span><span id="char-9"> </span><span id="char-10">c</span><span id="char-11">o</span><span id="char-12">m</span><span id="char-13">m</span><span id="char-14">u</span><span id="char-15">n</span><span id="char-16">i</span><span id="char-17">c</span><span id="char-18">a</span><span id="char-19">t</span><span id="char-20">i</span><span id="char-21">o</span><span id="char-22">n</span><span id="char-23"> </span><span id="char-24">i</span><span id="char-25">n</span><span id="char-26"> </span><span id="char-27">t</span><span id="char-28">h</span><span id="char-29">e</span><span id="char-30"> </span><span id="char-31">w</span><span id="char-32">o</span><span id="char-33">r</span><span id="char-34">k</span><span id="char-35">p</span><span id="char-36">l</span><span id="char-37">a</span><span id="char-38">c</span><span id="char-39">e</span><span id="char-40"> </span><span id="char-41">r</span><span id="char-42">e</span><span id="char-43">q</span><span id="char-44">u</span><span id="char-45">i</span><span id="char-46">r</span><span id="char-47">e</span><span id="char-48">s</span><span id="char-49"> </span><span id="char-50">c</span><span id="char-51">l</span><span id="char-52">a</span><span id="char-53">r</span><span id="char-54">i</span><span id="char-55">t</span><span id="char-56">y</span><span id="char-57">,</span><span id="char-58"> </span><span id="char-59">e</span><span id="char-60">m</span><span id="char-61">p</span><span id="char-62">a</span><span id="char-63">t</span><span id="char-64">h</span><span id="char-65">y</span><span id="char-66">,</span><span id="char-67"> </span><span id="char-68">a</span><span id="char-69">n</span><span id="char-70">d</span><span id="char-71"> </span><span id="char-72">a</span><span id="char-73">c</span><span id="char-74">t</span><span id="char-75">i</span><span id="char-76">v</span><span id="char-77">e</span><span id="char-78"> </span><span id="char-79">l</span><span id="char-80">i</span><span id="char-81">s</span><span id="char-82">t</span><span id="char-83">e</span><span id="char-84">n</span><span id="char-85">i</span><span id="char-86">n</span><span id="char-87">g</span><span id="char-88">.</span><span id="char-89"> </span><span id="char-90">A</span><span id="char-91">l</span><span id="char-92">w</span><span id="char-93">a</span><span id="char-94">y</span><span id="char-95">s</span><span id="char-96"> </span><span id="char-97">e</span><span id="char-98">n</span><span id="char-99">s</span><span id="char-100">u</span><span id="char-101">r</span><span id="char-102">e</span><span id="char-103"> </span><span id="char-104">y</span><span id="char-105">o</span><span id="char-106">u</span><span id="char-107">r</span><span id="char-108"> </span><span id="char-109">w</span><span id="char-110">r</span><span id="char-111">i</span><span id="char-112">t</span><span id="char-113">t</span><span id="char-114">e</span><span id="char-115">n</span><span id="char-116"> </span><span id="char-117">r</span><span id="char-118">e</span><span id="char-119">q</span><span id="char-120">u</span><span id="char-121">e</span><span id="char-122">s</span><span id="char-123">t</span><span id="char-124">s</span><span id="char-125"> </span><span id="char-126">a</span><span id="char-127">r</span><span id="char-128">e</span><span id="char-129"> </span><span id="char-130">s</span><span id="char-131">t</span><span id="char-132">r</span><span id="char-133">u</span><span id="char-134">c</span><span id="char-135">t</span><span id="char-136">u</span><span id="char-137">r</span><span id="char-138">e</span><span id="char-139">d</span><span id="char-140"> </span><span id="char-141">c</span><span id="char-142">o</span><span id="char-143">n</span><span id="char-144">c</span><span id="char-145">i</span><span id="char-146">s</span><span id="char-147">e</span><span id="char-148">l</span><span id="char-149">y</span><span id="char-150">.</span></div>
-
-                    <!-- Typing Input Area -->
-                    <div class="relative">
-                        <textarea id="typing-input" rows="3" oninput="handleTypingInput()" placeholder="Click 'Start Typing Test' below to begin..." class="w-full p-4 font-mono text-base border-2 border-slate-300 rounded-xl focus:border-brand-500 focus:ring-0 focus:outline-none transition disabled:bg-slate-50 disabled:cursor-not-allowed resize-none" disabled=""></textarea>
-                    </div>
-
-                    <!-- Action Controls -->
-                    <div class="flex items-center justify-between pt-2">
-                        <div class="flex items-center space-x-3">
-                            <button id="btn-start-typing" onclick="startTypingTest()" class="bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm px-6 py-2.5 rounded-lg shadow transition flex items-center space-x-2">
-                                <i class="fa-solid fa-play"></i>
-                                <span>Start Typing Test</span>
-                            </button>
-                            <button id="btn-reset-typing" onclick="resetTypingTest()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium text-sm px-4 py-2.5 rounded-lg transition flex items-center space-x-2">
-                                <i class="fa-solid fa-rotate-right"></i>
-                                <span>Reset</span>
-                            </button>
-                        </div>
-
-                        <span class="text-xs text-slate-400">Tip: Keep typing continuously without using Backspace unnecessarily.</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 3: BASIC EXCEL TEST -->
-        <section id="tab-excel" class="tab-content space-y-6">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-100 gap-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-file-excel text-emerald-600"></i>
-                            Basic Excel Spreadsheet Skills Test
-                        </h2>
-                        <p class="text-sm text-slate-500">Perform the basic cell operations requested in the tasks below to earn <strong>5 Marks</strong>.</p>
-                    </div>
-
-                    <div id="excel-score-card" class="bg-emerald-50 border border-emerald-200 px-4 py-2 rounded-lg text-right">
-                        <span class="text-xs text-emerald-700 font-medium block">Excel Test Marks</span>
-                        <span id="excel-score-display" class="text-lg font-bold text-emerald-800">4 / 5 Marks</span>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                    <!-- Tasks Instructions (1 Col) -->
-                    <div class="space-y-4">
-                        <div class="bg-slate-50 border border-slate-200 rounded-xl p-4">
-                            <h3 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
-                                <i class="fa-solid fa-list-check text-brand-600"></i>
-                                Excel Operations Tasks
-                            </h3>
-
-                            <div class="space-y-3 text-xs">
-                                <!-- Task 1 -->
-                                <div id="excel-task-1" class="p-3 bg-white border border-slate-200 rounded-lg flex items-start justify-between">
-                                    <div>
-                                        <span class="font-bold text-slate-700 block mb-0.5">Task 1: Find Value</span>
-                                        <p class="text-slate-500">Use the Find toolbar to locate <strong>"DEP-884"</strong> and click to select its cell.</p>
-                                    </div>
-                                    <span class="task-status bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">Completed</span>
-                                </div>
-
-                                <!-- Task 2 -->
-                                <div id="excel-task-2" class="p-3 bg-white border border-slate-200 rounded-lg flex items-start justify-between">
-                                    <div>
-                                        <span class="font-bold text-slate-700 block mb-0.5">Task 2: Copy &amp; Paste Value</span>
-                                        <p class="text-slate-500">Copy value from <strong>B2</strong> ($4,500) and paste it into cell <strong>E2</strong>.</p>
-                                    </div>
-                                    <span class="task-status bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">Completed</span>
-                                </div>
-
-                                <!-- Task 3 -->
-                                <div id="excel-task-3" class="p-3 bg-white border border-slate-200 rounded-lg flex items-start justify-between">
-                                    <div>
-                                        <span class="font-bold text-slate-700 block mb-0.5">Task 3: Cut &amp; Paste Value</span>
-                                        <p class="text-slate-500">Cut value from <strong>C4</strong> (PENDING) and paste into <strong>E4</strong>.</p>
-                                    </div>
-                                    <span class="task-status bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">Completed</span>
-                                </div>
-
-                                <!-- Task 4 -->
-                                <div id="excel-task-4" class="p-3 bg-white border border-slate-200 rounded-lg flex items-start justify-between">
-                                    <div>
-                                        <span class="font-bold text-slate-700 block mb-0.5">Task 4: Direct Cell Selection</span>
-                                        <p class="text-slate-500">Click to select cell <strong>D5</strong>.</p>
-                                    </div>
-                                    <span class="task-status bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">Completed</span>
-                                </div>
-
-                                <!-- Task 5 -->
-                                <div id="excel-task-5" class="p-3 bg-white border border-slate-200 rounded-lg flex items-start justify-between">
-                                    <div>
-                                        <span class="font-bold text-slate-700 block mb-0.5">Task 5: Edit Cell Content</span>
-                                        <p class="text-slate-500">Change value in cell <strong>A6</strong> to <strong>"COMPLETED"</strong>.</p>
-                                    </div>
-                                    <span class="task-status bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold">Completed</span>
-                                </div>
-                            </div>
-
-                            <button onclick="evaluateExcelTasks()" class="w-full mt-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs py-2.5 rounded-lg shadow transition flex items-center justify-center gap-2">
-                                <i class="fa-solid fa-check-double"></i> Validate &amp; Submit Excel Test
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Spreadsheet UI (2 Cols) -->
-                    <div class="lg:col-span-2 space-y-3">
-                        <!-- Spreadsheet Toolbar -->
-                        <div class="bg-slate-100 p-2.5 rounded-xl border border-slate-200 flex flex-wrap items-center justify-between gap-2">
-                            <div class="flex items-center space-x-2">
-                                <button onclick="excelCut()" class="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 rounded text-xs text-slate-700 font-medium flex items-center gap-1.5">
-                                    <i class="fa-solid fa-scissors text-slate-500"></i> Cut
-                                </button>
-                                <button onclick="excelCopy()" class="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 rounded text-xs text-slate-700 font-medium flex items-center gap-1.5">
-                                    <i class="fa-regular fa-copy text-slate-500"></i> Copy
-                                </button>
-                                <button onclick="excelPaste()" class="px-3 py-1.5 bg-white border border-slate-300 hover:bg-slate-50 rounded text-xs text-slate-700 font-medium flex items-center gap-1.5">
-                                    <i class="fa-regular fa-paste text-slate-500"></i> Paste
-                                </button>
-                            </div>
-
-                            <!-- Find Bar -->
-                            <div class="flex items-center space-x-1">
-                                <input type="text" id="excel-find-input" placeholder="Find value..." class="px-2.5 py-1.5 text-xs border border-slate-300 rounded focus:outline-none focus:ring-1 focus:ring-brand-500">
-                                <button onclick="excelFind()" class="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded text-xs font-medium flex items-center gap-1">
-                                    <i class="fa-solid fa-magnifying-glass"></i> Find
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Active Cell Info Box -->
-                        <div class="bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs flex items-center space-x-4">
-                            <span class="text-slate-400">Active Cell: <strong id="active-cell-ref" class="text-slate-800 font-mono">A6</strong></span>
-                            <span class="text-slate-400">Clipboard: <strong id="excel-clipboard-display" class="text-brand-600 font-mono">PENDING</strong></span>
-                        </div>
-
-                        <!-- Spreadsheet Grid Container -->
-                        <div class="overflow-x-auto border border-slate-300 rounded-lg bg-white shadow-inner">
-                            <table id="excel-grid" class="w-full text-xs text-left border-collapse select-none">
-                                <thead>
-                                    <tr class="bg-slate-200 text-slate-600 font-bold border-b border-slate-300 text-center">
-                                        <th class="p-2 border-r border-slate-300 w-12 bg-slate-300">#</th>
-                                        <th class="p-2 border-r border-slate-300 w-1/5">A</th>
-                                        <th class="p-2 border-r border-slate-300 w-1/5">B</th>
-                                        <th class="p-2 border-r border-slate-300 w-1/5">C</th>
-                                        <th class="p-2 border-r border-slate-300 w-1/5">D</th>
-                                        <th class="p-2 w-1/5">E</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="excel-grid-body"><tr class="border-b border-slate-200 hover:bg-slate-50"><td class="p-2 font-bold text-center bg-slate-100 text-slate-500 border-r border-slate-300">1</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="A1">ID Code</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="B1">Amount ($)</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="C1">Status</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="D1">Department</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="E1">Notes</td></tr><tr class="border-b border-slate-200 hover:bg-slate-50"><td class="p-2 font-bold text-center bg-slate-100 text-slate-500 border-r border-slate-300">2</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="A2">DEP-101</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="B2">$4,500</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="C2">ACTIVE</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="D2">Finance</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="E2">$4,500</td></tr><tr class="border-b border-slate-200 hover:bg-slate-50"><td class="p-2 font-bold text-center bg-slate-100 text-slate-500 border-r border-slate-300">3</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="A3">DEP-302</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="B3">$1,200</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="C3">APPROVED</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="D3">HR</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="E3">Urgent</td></tr><tr class="border-b border-slate-200 hover:bg-slate-50"><td class="p-2 font-bold text-center bg-slate-100 text-slate-500 border-r border-slate-300">4</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="A4">DEP-884</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="B4">$8,900</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="C4"></td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="D4">Logistics</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="E4">PENDING</td></tr><tr class="border-b border-slate-200 hover:bg-slate-50"><td class="p-2 font-bold text-center bg-slate-100 text-slate-500 border-r border-slate-300">5</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="A5">DEP-505</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="B5">$3,100</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="C5">COMPLETED</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="D5">IT</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="E5">Closed</td></tr><tr class="border-b border-slate-200 hover:bg-slate-50"><td class="p-2 font-bold text-center bg-slate-100 text-slate-500 border-r border-slate-300">6</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="A6">"COMPLETED"</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="B6">$2,700</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="C6">ACTIVE</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="D6">Sales</td><td class="p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none" contenteditable="true" data-cell-ref="E6">Review</td></tr></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 4: SCORE DASHBOARD -->
-        <section id="tab-dashboard" class="tab-content hidden space-y-6">
-            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-slate-100 gap-4">
-                    <div>
-                        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-chart-pie text-brand-600"></i>
-                            Candidate Assessment Score Dashboard
-                        </h2>
-                        <p class="text-sm text-slate-500">Summary of Webmail, Typing Speed, and Excel Skill Evaluation.</p>
-                    </div>
-
-                    <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs px-4 py-2 rounded-lg transition flex items-center space-x-2">
-                        <i class="fa-solid fa-print"></i>
-                        <span>Print Assessment Report</span>
-                    </button>
-                </div>
-
-                <!-- Final Score Overview Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-6">
-                    <!-- Webmail Marks Card -->
-                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 relative overflow-hidden">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-semibold text-slate-500 uppercase">1. Webmail &amp; OTP Test</span>
-                            <i class="fa-solid fa-envelope text-brand-500 text-xl"></i>
-                        </div>
-                        <div id="dash-webmail-score" class="text-3xl font-extrabold text-slate-800 mt-3">0 / 5</div>
-                        <p id="dash-webmail-status" class="text-xs text-slate-500 mt-1">Pending Verification</p>
-                    </div>
-
-                    <!-- Typing Speed Card -->
-                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 relative overflow-hidden">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-semibold text-slate-500 uppercase">2. Typing Speed Test</span>
-                            <i class="fa-solid fa-keyboard text-amber-500 text-xl"></i>
-                        </div>
-                        <div id="dash-typing-wpm" class="text-3xl font-extrabold text-slate-800 mt-3">0 WPM</div>
-                        <p id="dash-typing-status" class="text-xs text-slate-500 mt-1">Target: 30 WPM</p>
-                    </div>
-
-                    <!-- Excel Test Marks Card -->
-                    <div class="bg-slate-50 border border-slate-200 rounded-xl p-5 relative overflow-hidden">
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs font-semibold text-slate-500 uppercase">3. Excel Skills Test</span>
-                            <i class="fa-solid fa-file-excel text-emerald-500 text-xl"></i>
-                        </div>
-                        <div id="dash-excel-score" class="text-3xl font-extrabold text-slate-800 mt-3">4 / 5</div>
-                        <p id="dash-excel-status" class="text-xs text-slate-500 mt-1">Tasks Completed: 4 / 5</p>
-                    </div>
-                </div>
-
-                <!-- Comprehensive Verdict Banner -->
-                <div id="verdict-banner" class="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center space-y-2">
-                    <span class="text-xs uppercase font-bold text-blue-600 tracking-wider">Overall Assessment Result</span>
-                    <h3 id="verdict-title" class="text-2xl font-bold text-amber-800">NEEDS IMPROVEMENT</h3>
-                    <p id="verdict-description" class="text-sm text-blue-700 max-w-xl mx-auto">Current score: 4/10 marks, Typing: 0 WPM. Minimum qualification requires 30 WPM and completing both Webmail &amp; Excel tasks.</p>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <!-- Admin Login Modal -->
-    <div id="admin-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 border border-slate-200 space-y-5">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
-                    <i class="fa-solid fa-user-gear text-brand-600"></i> Admin Portal
-                </h3>
-                <button onclick="closeAdminModal()" class="text-slate-400 hover:text-slate-600 text-lg">×</button>
-            </div>
-
-            <!-- Login View -->
-            <div id="admin-login-view" class="space-y-4 hidden">
-                <p class="text-xs text-slate-500">Default security login. Admin credentials are cryptographic SHA-256 hashed and obscured from visible HTML source.</p>
-                
-                <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">Admin ID</label>
-                    <input type="text" id="admin-id-input" placeholder="admin" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-medium text-slate-600 mb-1">Password</label>
-                    <input type="password" id="admin-pass-input" placeholder="admin123" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:ring-2 focus:ring-brand-500 focus:outline-none">
-                </div>
-
-                <button onclick="attemptAdminLogin()" class="w-full bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium py-2.5 rounded-md transition shadow">
-                    Authenticate Admin Access
-                </button>
-            </div>
-
-            <!-- Authenticated Admin Control View -->
-            <div id="admin-dashboard-view" class="space-y-4">
-                <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-lg text-xs text-emerald-800 flex items-center gap-2">
-                    <i class="fa-solid fa-circle-check text-emerald-600"></i> Admin Access Granted
-                </div>
-
-                <div class="space-y-2 text-xs">
-                    <h4 class="font-bold text-slate-700">Assessment Parameters Controls</h4>
-                    <button onclick="resetAllTests()" class="w-full bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-medium py-2 rounded transition">
-                        Reset Candidate Progress
-                    </button>
-                </div>
+    <!-- Friendly Start Overlay (Helps unlock audio on mobile devices with one big tap) -->
+    <div id="startScreen" onclick="startPlay()" class="absolute inset-0 bg-sky-400/80 backdrop-blur-sm flex flex-col items-center justify-center z-20 cursor-pointer p-6 text-center">
+        <div class="bg-white rounded-[3rem] p-8 sm:p-12 shadow-2xl border-8 border-yellow-300 max-w-md w-full transform transition-transform active:scale-95">
+            <div class="text-7xl sm:text-8xl mb-4 animate-bounce">🫧🐶🫧</div>
+            <h1 class="text-4xl sm:text-5xl font-bold text-sky-600 mb-3">Bubble Pop!</h1>
+            <p class="text-xl sm:text-2xl text-slate-600 mb-6">Tap anywhere to play!</p>
+            <div class="bg-emerald-500 text-white text-3xl sm:text-4xl font-bold py-5 px-8 rounded-full shadow-lg border-b-8 border-emerald-700">
+                ▶️ PLAY
             </div>
         </div>
     </div>
 
     <script>
-        // Global Application State
-        const state = {
-            webmailPassed: false,
-            webmailMarks: 0,
-            generatedOTP: "",
-            
-            // Typing Test State
-            typingSetIndex: 0,
-            typingTimer: null,
-            timeLeft: 60,
-            typingActive: false,
-            typedCharCount: 0,
-            errorsCount: 0,
-            wpmScore: 0,
-            accuracyScore: 100,
+        /* ==========================================================================
+           TODDLER BUBBLE POP - DESIGNED FOR 2-YEAR-OLDS
+           - No losing, no timers, no stressful sounds
+           - Giant hitboxes (easy for small fingers)
+           - Multi-touch support (can tap with whole hand!)
+           - Tapping empty space also creates fun bubbles & stars!
+           ========================================================================== */
 
-            // Excel State
-            activeCellRef: null,
-            clipboardValue: null,
-            excelMarks: 0,
-            excelTasksPassed: [false, false, false, false, false],
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const starCountEl = document.getElementById('starCount');
+        const startScreen = document.getElementById('startScreen');
+        const soundBtn = document.getElementById('soundBtn');
+        const exitProgress = document.getElementById('exitProgress');
+        const parentToast = document.getElementById('parentToast');
 
-            // Admin Crypto SHA-256 Hashes
-            // ID: 'admin' => '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'
-            // Pass: 'admin123' => '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9'
-            adminIdHash: "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
-            adminPassHash: "240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9"
-        };
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+        let starsCollected = 0;
+        let soundEnabled = true;
+        let gameStarted = false;
+        let isToddlerLocked = false;
+        let exitHoldTimer = null;
+        let exitAnimFrame = null;
 
-        // 10 Preset Typing Prompt Texts
-        const typingSets = [
-            "Effective communication in the workplace requires clarity, empathy, and active listening. Always ensure your written requests are structured concisely.",
-            "Thank you for contacting our customer support team today. We appreciate your patience while we investigate your inquiry regarding account renewal.",
-            "Please verify all numerical values, account balances, and client contact information before submitting the monthly financial reconciliation report.",
-            "Dear Hiring Manager, please find attached my updated curriculum vitae and professional recommendations for your review. Best regards.",
-            "Restarting your network router and flushing the DNS cache often resolves temporary connectivity issues across office workstations.",
-            "All pending invoices must be approved by the department manager prior to the end of the fiscal quarter to ensure timely vendor payment.",
-            "Employees are requested to update their emergency contact details and review the updated company policy document in the employee portal.",
-            "The project roadmap outlines key milestones, team deliverables, risk mitigation strategies, and estimated deadlines for the quarter.",
-            "Order processing times have improved by fifteen percent following the integration of automated inventory management software.",
-            "Quarterly revenue increased steadily due to strong enterprise adoption, improved operational efficiency, and expanded market presence."
+        // Arrays to hold active bubbles, floating animals, and colorful confetti stars
+        let bubbles = [];
+        let floatingAnimals = [];
+        let particles = [];
+
+        // Cute, recognizable animals and objects for a 2-year-old
+        const toddlerFriends = [
+            '🐶', '🐱', '🐰', '🐻', '🐼', '🦁', '🐸', '🐷',
+            '🐮', '🐵', '🐥', '🦆', '🐢', '🐠', '🦋', '🐞',
+            '🚗', '🚂', '🎈', '🍎', '🍌', '🍓', '🌟', '🌈'
         ];
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('border-brand-600', 'text-brand-600');
-                btn.classList.add('border-transparent', 'text-slate-500');
-            });
+        // Bright, cheerful pastel & primary bubble colors
+        const bubbleColors = [
+            { fill: 'rgba(255, 107, 107, 0.45)', stroke: '#ff6b6b' }, // Coral Red
+            { fill: 'rgba(78, 205, 196, 0.45)', stroke: '#4ecdc4' },  // Turquoise
+            { fill: 'rgba(255, 217, 61, 0.50)', stroke: '#f59e0b' },  // Sunny Yellow
+            { fill: 'rgba(107, 91, 149, 0.40)', stroke: '#8b5cf6' },  // Soft Purple
+            { fill: 'rgba(255, 159, 243, 0.45)', stroke: '#ec4899' }, // Bubblegum Pink
+            { fill: 'rgba(84, 160, 255, 0.45)', stroke: '#3b82f6' }   // Sky Blue
+        ];
 
-            document.getElementById(tabId).classList.remove('hidden');
-            const activeBtn = document.getElementById('btn-' + tabId);
-            activeBtn.classList.add('border-brand-600', 'text-brand-600');
-            activeBtn.classList.remove('border-transparent', 'text-slate-500');
+        /* ==========================================================================
+           GENTLE AUDIO ENGINE (Pentatonic Scale - Always sounds sweet!)
+           ========================================================================== */
+        let synth = null;
+        // C Major Pentatonic notes (no matter what order they play, it always sounds harmonious!)
+        const happyNotes = ['C4', 'D4', 'E4', 'G4', 'A4', 'C5', 'D5', 'E5'];
 
-            if(tabId === 'tab-dashboard') {
-                updateDashboard();
+        function initAudio() {
+            if (!synth && typeof Tone !== 'undefined') {
+                synth = new Tone.PolySynth(Tone.Synth, {
+                    oscillator: { type: 'sine' }, // Soft, warm flute/bell tone
+                    envelope: {
+                        attack: 0.02,
+                        decay: 0.2,
+                        sustain: 0.1,
+                        release: 0.8
+                    }
+                }).toDestination();
+                synth.volume.value = -6; // Gentle volume for little ears
+            }
+            if (Tone.context.state !== 'running') {
+                Tone.start();
             }
         }
 
-        function handleWebmailLogin(e) {
+        function playHappyChime() {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                if (synth) {
+                    const note = happyNotes[Math.floor(Math.random() * happyNotes.length)];
+                    synth.triggerAttackRelease(note, '8n');
+                }
+            } catch (e) {
+                // Ignore if audio isn't unlocked yet
+            }
+        }
+
+        function toggleSound(e) {
+            e.stopPropagation();
+            soundEnabled = !soundEnabled;
+            soundBtn.textContent = soundEnabled ? '🔊' : '🔇';
+            if (soundEnabled) playHappyChime();
+        }
+
+        /* ==========================================================================
+           CANVAS RESIZING & INITIALIZATION
+           ========================================================================== */
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function startPlay() {
+            gameStarted = true;
+            isToddlerLocked = true;
+            startScreen.style.display = 'none';
+            initAudio();
+            playHappyChime();
+            enterKioskFullscreen();
+            
+            // Spawn initial batch of giant bubbles
+            for (let i = 0; i < 6; i++) {
+                spawnBubble(
+                    Math.random() * (width - 160) + 80,
+                    Math.random() * (height - 160) + 80
+                );
+            }
+        }
+
+        /* ==========================================================================
+           TODDLER LOCK / KIOSK FULLSCREEN & PARENT HOLD-TO-EXIT
+           ========================================================================== */
+        function showParentToast(msg) {
+            parentToast.textContent = msg;
+            parentToast.style.opacity = '1';
+            clearTimeout(parentToast._hideTimeout);
+            parentToast._hideTimeout = setTimeout(() => {
+                parentToast.style.opacity = '0';
+            }, 2500);
+        }
+
+        function enterKioskFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(() => {});
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            }
+            // Trap Android Back Button using History API
+            window.history.pushState({ locked: true }, '');
+        }
+
+        // Prevent accidental back navigation while Toddler Lock is active
+        window.addEventListener('popstate', () => {
+            if (isToddlerLocked) {
+                window.history.pushState({ locked: true }, '');
+                showParentToast('🔒 Toddler Lock Active: Hold "Hold to Exit" for 3s');
+            }
+        });
+
+        // Re-engage fullscreen if user swipes status bar while still locked
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement && isToddlerLocked) {
+                showParentToast('🔒 Tap screen to re-lock fullscreen or Hold Exit for 3s');
+            }
+        });
+
+        // Re-lock fullscreen on any screen tap if exited accidentally
+        canvas.addEventListener('pointerdown', () => {
+            if (isToddlerLocked && !document.fullscreenElement) {
+                enterKioskFullscreen();
+            }
+        });
+
+        function startExitHold(e) {
+            e.stopPropagation();
+            if (e.cancelable) e.preventDefault();
+            
+            const holdDuration = 3000; // 3 seconds hold required for parents
+            const startTime = performance.now();
+            showParentToast('Keep holding for 3 seconds to exit...');
+
+            function updateProgress(now) {
+                const elapsed = now - startTime;
+                const pct = Math.min(100, (elapsed / holdDuration) * 100);
+                exitProgress.style.width = `${pct}%`;
+
+                if (pct >= 100) {
+                    unlockAndExit();
+                } else {
+                    exitAnimFrame = requestAnimationFrame(updateProgress);
+                }
+            }
+            exitAnimFrame = requestAnimationFrame(updateProgress);
+        }
+
+        function cancelExitHold(e) {
+            if (e) e.stopPropagation();
+            cancelAnimationFrame(exitAnimFrame);
+            exitProgress.style.width = '0%';
+        }
+
+        function unlockAndExit() {
+            isToddlerLocked = false;
+            gameStarted = false;
+            exitProgress.style.width = '0%';
+            
+            if (document.fullscreenElement && document.exitFullscreen) {
+                document.exitFullscreen().catch(() => {});
+            }
+            // Return to start screen so parent can safely close or switch apps
+            startScreen.style.display = 'flex';
+            showParentToast('🔓 Toddler Lock Unlocked! Safe to exit.');
+        }
+
+        /* ==========================================================================
+           BUBBLE, ANIMAL & CONFETTI CLASSES
+           ========================================================================== */
+        function spawnBubble(x, y, isExtraLarge = false) {
+            // Giant radius (65px to 95px) so a 2-year-old can easily tap it
+            const baseRadius = Math.min(width, height) * 0.11;
+            const radius = Math.max(60, Math.min(100, baseRadius)) + (isExtraLarge ? 15 : Math.random() * 20);
+            
+            const color = bubbleColors[Math.floor(Math.random() * bubbleColors.length)];
+            const emoji = toddlerFriends[Math.floor(Math.random() * toddlerFriends.length)];
+
+            bubbles.push({
+                x: x !== undefined ? x : Math.random() * (width - radius * 2) + radius,
+                y: y !== undefined ? y : height + radius,
+                radius: radius,
+                vx: (Math.random() - 0.5) * 1.2, // Very slow horizontal drift
+                vy: -(Math.random() * 1.2 + 0.8), // Very gentle upward float
+                wobblePhase: Math.random() * Math.PI * 2,
+                color: color,
+                emoji: emoji,
+                scale: 0.1 // Pop-in animation
+            });
+        }
+
+        function popBubble(bubble, index) {
+            // Remove bubble
+            bubbles.splice(index, 1);
+
+            // Play sweet musical chime
+            playHappyChime();
+
+            // Increment star counter
+            starsCollected++;
+            starCountEl.textContent = starsCollected;
+
+            // Create a happy jumping animal where the bubble popped
+            floatingAnimals.push({
+                x: bubble.x,
+                y: bubble.y,
+                vy: -4,
+                emoji: bubble.emoji,
+                scale: 1,
+                alpha: 1
+            });
+
+            // Create burst of colorful confetti stars & mini bubbles
+            const burstColors = ['#ff6b6b', '#ffd93d', '#4ecdc4', '#ff9ff3', '#54a0ff', '#1dd1a1'];
+            for (let i = 0; i < 16; i++) {
+                const angle = (Math.PI * 2 * i) / 16;
+                const speed = Math.random() * 5 + 2;
+                particles.push({
+                    x: bubble.x,
+                    y: bubble.y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    size: Math.random() * 12 + 8,
+                    color: burstColors[i % burstColors.length],
+                    alpha: 1,
+                    isStar: i % 2 === 0
+                });
+            }
+        }
+
+        /* ==========================================================================
+           MULTI-TOUCH & MOUSE INTERACTION (Tapping anywhere is rewarding!)
+           ========================================================================== */
+        function handleTap(clientX, clientY) {
+            if (!gameStarted) return;
+
+            let hitABubble = false;
+
+            // Check backwards so top bubbles get popped first
+            // Add generous +25px extra padding around hitbox for little fingers!
+            for (let i = bubbles.length - 1; i >= 0; i--) {
+                const b = bubbles[i];
+                const dx = clientX - b.x;
+                const dy = clientY - b.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist <= b.radius + 25) {
+                    popBubble(b, i);
+                    hitABubble = true;
+                    break; // Pop one bubble per finger touch
+                }
+            }
+
+            // If toddler taps empty sky, spawn a brand new giant bubble right under their finger!
+            if (!hitABubble) {
+                playHappyChime();
+                if (bubbles.length < 10) {
+                    spawnBubble(clientX, clientY, true);
+                }
+                // Little sparkle at finger tip
+                for (let i = 0; i < 6; i++) {
+                    const angle = (Math.PI * 2 * i) / 6;
+                    particles.push({
+                        x: clientX,
+                        y: clientY,
+                        vx: Math.cos(angle) * 3,
+                        vy: Math.sin(angle) * 3,
+                        size: 10,
+                        color: '#ffd93d',
+                        alpha: 1,
+                        isStar: true
+                    });
+                }
+            }
+        }
+
+        // Support multi-touch (toddlers often slap the screen with multiple fingers!)
+        canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            const email = document.getElementById('wm-email').value.trim();
-            const pass = document.getElementById('wm-password').value.trim();
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                const touch = e.changedTouches[i];
+                handleTap(touch.clientX, touch.clientY);
+            }
+        }, { passive: false });
 
-            if (email === "candidate@assess.com" && pass === "Verify2026!") {
-                // Generate 6-Digit OTP
-                state.generatedOTP = Math.floor(100000 + Math.random() * 900000).toString();
+        // Support mouse clicks
+        canvas.addEventListener('mousedown', (e) => {
+            handleTap(e.clientX, e.clientY);
+        });
+
+        /* ==========================================================================
+           DRAWING HELPERS
+           ========================================================================== */
+        function drawStar(cx, cy, spikes, outerRadius, innerRadius, color, alpha) {
+            let rot = (Math.PI / 2) * 3;
+            let x = cx;
+            let y = cy;
+            let step = Math.PI / spikes;
+
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - outerRadius);
+            for (let i = 0; i < spikes; i++) {
+                x = cx + Math.cos(rot) * outerRadius;
+                y = cy + Math.sin(rot) * outerRadius;
+                ctx.lineTo(x, y);
+                rot += step;
+
+                x = cx + Math.cos(rot) * innerRadius;
+                y = cy + Math.sin(rot) * innerRadius;
+                ctx.lineTo(x, y);
+                rot += step;
+            }
+            ctx.lineTo(cx, cy - outerRadius);
+            ctx.closePath();
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawBackgroundHills() {
+            // Soft rolling green hills at the bottom for a cozy storybook feel
+            ctx.fillStyle = '#86efac';
+            ctx.beginPath();
+            ctx.moveTo(0, height);
+            ctx.lineTo(0, height - 80);
+            ctx.quadraticCurveTo(width * 0.25, height - 140, width * 0.5, height - 70);
+            ctx.quadraticCurveTo(width * 0.75, height - 10, width, height - 90);
+            ctx.lineTo(width, height);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.fillStyle = '#4ade80';
+            ctx.beginPath();
+            ctx.moveTo(0, height);
+            ctx.lineTo(0, height - 45);
+            ctx.quadraticCurveTo(width * 0.4, height - 10, width * 0.7, height - 60);
+            ctx.quadraticCurveTo(width * 0.9, height - 85, width, height - 40);
+            ctx.lineTo(width, height);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        /* ==========================================================================
+           MAIN ANIMATION LOOP
+           ========================================================================== */
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Draw cute hills at bottom
+            drawBackgroundHills();
+
+            // Keep 6 to 7 giant bubbles floating on screen automatically
+            if (gameStarted && bubbles.length < 6 && Math.random() < 0.04) {
+                spawnBubble();
+            }
+
+            // 1. Update & Draw Bubbles
+            for (let i = bubbles.length - 1; i >= 0; i--) {
+                const b = bubbles[i];
                 
-                // Update Simulated Webmail Client
-                document.getElementById('wm-inbox-status').innerText = "Status: New Email Received";
-                document.getElementById('wm-email-empty').classList.add('hidden');
-                document.getElementById('wm-email-item').classList.remove('hidden');
-                document.getElementById('wm-otp-display').innerText = state.generatedOTP;
-
-                // Show OTP Input Form
-                document.getElementById('webmail-login-card').classList.add('hidden');
-                document.getElementById('webmail-otp-card').classList.remove('hidden');
-            } else {
-                alert("Invalid Webmail Credentials! Use candidate@assess.com and Verify2026!");
-            }
-        }
-
-        function verifyOTP() {
-            const inputOTP = document.getElementById('wm-otp-input').value.trim();
-            if (inputOTP === state.generatedOTP) {
-                state.webmailPassed = true;
-                state.webmailMarks = 5;
-
-                document.getElementById('webmail-score-display').innerText = "5 / 5 Marks";
-                document.getElementById('badge-webmail-status').innerText = "Passed (5/5)";
-                document.getElementById('badge-webmail-status').className = "px-2 py-0.5 rounded-full bg-emerald-800 text-emerald-200 border border-emerald-700";
-
-                alert("OTP Verification Successful! You earned 5 Marks.");
-                updateDashboard();
-            } else {
-                alert("Incorrect OTP! Please check your simulated Webmail inbox on the right.");
-            }
-        }
-
-        function loadTypingSet() {
-            const selIndex = parseInt(document.getElementById('typing-set-select').value);
-            state.typingSetIndex = selIndex;
-            resetTypingTest();
-        }
-
-        function renderTypingText() {
-            const text = typingSets[state.typingSetIndex];
-            const displayBox = document.getElementById('typing-text-display');
-            displayBox.innerHTML = '';
-
-            for (let i = 0; i < text.length; i++) {
-                const charSpan = document.createElement('span');
-                charSpan.innerText = text[i];
-                charSpan.id = `char-${i}`;
-                if (i === 0) charSpan.classList.add('current-char');
-                displayBox.appendChild(charSpan);
-            }
-        }
-
-        function startTypingTest() {
-            resetTypingTest();
-            state.typingActive = true;
-            document.getElementById('typing-input').disabled = false;
-            document.getElementById('typing-input').focus();
-            document.getElementById('btn-start-typing').disabled = true;
-
-            state.typingTimer = setInterval(() => {
-                state.timeLeft--;
-                document.getElementById('typing-timer').innerText = state.timeLeft + 's';
-
-                if (state.timeLeft <= 0) {
-                    endTypingTest();
+                // Smooth pop-in growth
+                if (b.scale < 1) {
+                    b.scale = Math.min(1, b.scale + 0.08);
                 }
-            }, 1000);
-        }
 
-        function handleTypingInput() {
-            if (!state.typingActive) return;
+                // Gentle floating movement
+                b.wobblePhase += 0.03;
+                b.x += b.vx + Math.sin(b.wobblePhase) * 0.6;
+                b.y += b.vy;
 
-            const targetText = typingSets[state.typingSetIndex];
-            const inputVal = document.getElementById('typing-input').value;
-            state.typedCharCount = inputVal.length;
+                // Keep bubbles bouncing gently off left/right walls so they stay on screen
+                if (b.x - b.radius < 10) {
+                    b.x = b.radius + 10;
+                    b.vx = Math.abs(b.vx);
+                } else if (b.x + b.radius > width - 10) {
+                    b.x = width - b.radius - 10;
+                    b.vx = -Math.abs(b.vx);
+                }
 
-            let errors = 0;
-            for (let i = 0; i < targetText.length; i++) {
-                const charSpan = document.getElementById(`char-${i}`);
-                if (!charSpan) continue;
+                // If bubble floats off the top, wrap it gently back to the bottom
+                if (b.y + b.radius < -20) {
+                    b.y = height + b.radius;
+                    b.x = Math.random() * (width - b.radius * 2) + b.radius;
+                }
 
-                charSpan.className = '';
-                if (i < inputVal.length) {
-                    if (inputVal[i] === targetText[i]) {
-                        charSpan.classList.add('correct-char');
-                    } else {
-                        charSpan.classList.add('incorrect-char');
-                        errors++;
-                    }
-                } else if (i === inputVal.length) {
-                    charSpan.classList.add('current-char');
+                const currentRadius = b.radius * b.scale;
+
+                ctx.save();
+                // Bubble body
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, currentRadius, 0, Math.PI * 2);
+                ctx.fillStyle = b.color.fill;
+                ctx.fill();
+                ctx.lineWidth = 5;
+                ctx.strokeStyle = b.color.stroke;
+                ctx.stroke();
+
+                // Glossy white shine highlight on top-left of bubble
+                ctx.beginPath();
+                ctx.arc(
+                    b.x - currentRadius * 0.32,
+                    b.y - currentRadius * 0.32,
+                    currentRadius * 0.18,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+                ctx.fill();
+
+                // Cute animal/object inside the bubble
+                ctx.font = `${Math.floor(currentRadius * 0.95)}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(b.emoji, b.x, b.y + 4);
+                ctx.restore();
+            }
+
+            // 2. Update & Draw Happy Popped Animals
+            for (let i = floatingAnimals.length - 1; i >= 0; i--) {
+                const anim = floatingAnimals[i];
+                anim.y += anim.vy;
+                anim.vy += 0.15; // Gentle hop arc
+                anim.scale += 0.025;
+                anim.alpha -= 0.025;
+
+                if (anim.alpha <= 0) {
+                    floatingAnimals.splice(i, 1);
+                    continue;
+                }
+
+                ctx.save();
+                ctx.globalAlpha = anim.alpha;
+                ctx.font = `${Math.floor(85 * anim.scale)}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(anim.emoji, anim.x, anim.y);
+                ctx.restore();
+            }
+
+            // 3. Update & Draw Confetti & Stars
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.12; // Gentle gravity
+                p.alpha -= 0.025;
+
+                if (p.alpha <= 0) {
+                    particles.splice(i, 1);
+                    continue;
+                }
+
+                if (p.isStar) {
+                    drawStar(p.x, p.y, 5, p.size, p.size * 0.45, p.color, p.alpha);
+                } else {
+                    ctx.save();
+                    ctx.globalAlpha = p.alpha;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size * 0.6, 0, Math.PI * 2);
+                    ctx.fillStyle = p.color;
+                    ctx.fill();
+                    ctx.restore();
                 }
             }
 
-            state.errorsCount = errors;
-
-            // Live WPM Calculation (Standard formula: (Characters Typed / 5) / Elapsed Minutes)
-            const timeElapsedMin = (60 - state.timeLeft) / 60 || 1/60;
-            const wordsTyped = inputVal.length / 5;
-            state.wpmScore = Math.round(wordsTyped / timeElapsedMin);
-            
-            // Live Accuracy %
-            state.accuracyScore = inputVal.length > 0 
-                ? Math.max(0, Math.round(((inputVal.length - errors) / inputVal.length) * 100))
-                : 100;
-
-            document.getElementById('typing-wpm').innerText = state.wpmScore;
-            document.getElementById('typing-accuracy').innerText = state.accuracyScore + '%';
-
-            // Auto-complete if target text fully typed
-            if (inputVal.length >= targetText.length) {
-                endTypingTest();
-            }
+            requestAnimationFrame(animate);
         }
 
-        function endTypingTest() {
-            clearInterval(state.typingTimer);
-            state.typingActive = false;
-            document.getElementById('typing-input').disabled = true;
-            document.getElementById('btn-start-typing').disabled = false;
-
-            const badge = document.getElementById('typing-status-badge');
-            if (state.wpmScore >= 30) {
-                badge.innerText = "PASSED (≥ 30 WPM)";
-                badge.className = "mt-2 inline-block px-3 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-700 border border-emerald-300";
-            } else {
-                badge.innerText = "NEEDS IMPROVEMENT (< 30 WPM)";
-                badge.className = "mt-2 inline-block px-3 py-1 text-xs font-bold rounded-full bg-red-100 text-red-700 border border-red-300";
-            }
-
-            document.getElementById('badge-typing-status').innerText = `${state.wpmScore} WPM`;
-            updateDashboard();
-        }
-
-        function resetTypingTest() {
-            clearInterval(state.typingTimer);
-            state.typingActive = false;
-            state.timeLeft = 60;
-            state.wpmScore = 0;
-            state.accuracyScore = 100;
-            
-            document.getElementById('typing-timer').innerText = '60s';
-            document.getElementById('typing-wpm').innerText = '0';
-            document.getElementById('typing-accuracy').innerText = '100%';
-            document.getElementById('typing-input').value = '';
-            document.getElementById('typing-input').disabled = true;
-            document.getElementById('btn-start-typing').disabled = false;
-
-            const badge = document.getElementById('typing-status-badge');
-            badge.innerText = "Not Started";
-            badge.className = "mt-2 inline-block px-3 py-1 text-xs font-bold rounded-full bg-slate-200 text-slate-600";
-
-            renderTypingText();
-        }
-
-        const initialExcelData = [
-            ["ID Code", "Amount ($)", "Status", "Department", "Notes"],
-            ["DEP-101", "$4,500", "ACTIVE", "Finance", "Standard"],
-            ["DEP-302", "$1,200", "APPROVED", "HR", "Urgent"],
-            ["DEP-884", "$8,900", "PENDING", "Logistics", "Verify"],
-            ["DEP-505", "$3,100", "COMPLETED", "IT", "Closed"],
-            ["UPDATE_ME", "$2,700", "ACTIVE", "Sales", "Review"]
-        ];
-
-        function renderExcelGrid() {
-            const tbody = document.getElementById('excel-grid-body');
-            tbody.innerHTML = '';
-
-            for (let r = 0; r < initialExcelData.length; r++) {
-                const tr = document.createElement('tr');
-                tr.className = "border-b border-slate-200 hover:bg-slate-50";
-
-                // Row header
-                const th = document.createElement('td');
-                th.className = "p-2 font-bold text-center bg-slate-100 text-slate-500 border-r border-slate-300";
-                th.innerText = r + 1;
-                tr.appendChild(th);
-
-                for (let c = 0; c < 5; c++) {
-                    const colLetter = String.fromCharCode(65 + c);
-                    const cellRef = `${colLetter}${r + 1}`;
-
-                    const td = document.createElement('td');
-                    td.className = "p-2 border-r border-slate-200 font-mono text-slate-700 excel-cell focus:outline-none";
-                    td.contentEditable = true;
-                    td.innerText = initialExcelData[r][c];
-                    td.dataset.cellRef = cellRef;
-
-                    td.onclick = () => selectExcelCell(cellRef, td);
-                    tr.appendChild(td);
-                }
-                tbody.appendChild(tr);
-            }
-        }
-
-        function selectExcelCell(cellRef, tdElement) {
-            state.activeCellRef = cellRef;
-            document.getElementById('active-cell-ref').innerText = cellRef;
-
-            // Check Task 4 (Direct Cell Selection D5)
-            if (cellRef === "D5") {
-                state.excelTasksPassed[3] = true;
-                updateTaskBadge('excel-task-4', true);
-            }
-        }
-
-        function excelCopy() {
-            if (!state.activeCellRef) return alert("Select a cell first!");
-            const cell = document.querySelector(`[data-cell-ref="${state.activeCellRef}"]`);
-            if (cell) {
-                state.clipboardValue = cell.innerText;
-                document.getElementById('excel-clipboard-display').innerText = state.clipboardValue;
-            }
-        }
-
-        function excelCut() {
-            if (!state.activeCellRef) return alert("Select a cell first!");
-            const cell = document.querySelector(`[data-cell-ref="${state.activeCellRef}"]`);
-            if (cell) {
-                state.clipboardValue = cell.innerText;
-                cell.innerText = "";
-                document.getElementById('excel-clipboard-display').innerText = state.clipboardValue;
-            }
-        }
-
-        function excelPaste() {
-            if (!state.activeCellRef) return alert("Select a cell first!");
-            if (state.clipboardValue === null) return alert("Clipboard is empty!");
-            
-            const cell = document.querySelector(`[data-cell-ref="${state.activeCellRef}"]`);
-            if (cell) {
-                cell.innerText = state.clipboardValue;
-            }
-        }
-
-        function excelFind() {
-            const query = document.getElementById('excel-find-input').value.trim();
-            if (!query) return;
-
-            document.querySelectorAll('.excel-cell').forEach(c => c.classList.remove('highlight-cell'));
-
-            let found = false;
-            document.querySelectorAll('.excel-cell').forEach(cell => {
-                if (cell.innerText.includes(query)) {
-                    cell.classList.add('highlight-cell');
-                    found = true;
-
-                    // Task 1 Check
-                    if (query === "DEP-884") {
-                        state.excelTasksPassed[0] = true;
-                        updateTaskBadge('excel-task-1', true);
-                    }
-                }
-            });
-
-            if (!found) alert("Value not found in spreadsheet!");
-        }
-
-        function evaluateExcelTasks() {
-            // Task 2 check: Cell E2 must equal "$4,500"
-            const e2 = document.querySelector('[data-cell-ref="E2"]')?.innerText.trim();
-            if (e2 === "$4,500") {
-                state.excelTasksPassed[1] = true;
-                updateTaskBadge('excel-task-2', true);
-            }
-
-            // Task 3 check: Cell E4 must equal "PENDING"
-            const e4 = document.querySelector('[data-cell-ref="E4"]')?.innerText.trim();
-            if (e4 === "PENDING") {
-                state.excelTasksPassed[2] = true;
-                updateTaskBadge('excel-task-3', true);
-            }
-
-            // Task 5 check: Cell A6 must equal "COMPLETED"
-            const a6 = document.querySelector('[data-cell-ref="A6"]')?.innerText.trim();
-            if (a6 === "COMPLETED") {
-                state.excelTasksPassed[4] = true;
-                updateTaskBadge('excel-task-5', true);
-            }
-
-            // Calculate score
-            const passedCount = state.excelTasksPassed.filter(Boolean).length;
-            state.excelMarks = passedCount;
-
-            document.getElementById('excel-score-display').innerText = `${state.excelMarks} / 5 Marks`;
-            document.getElementById('badge-excel-status').innerText = `${state.excelMarks}/5 Marks`;
-            if(state.excelMarks === 5) {
-                document.getElementById('badge-excel-status').className = "px-2 py-0.5 rounded-full bg-emerald-800 text-emerald-200 border border-emerald-700";
-            }
-
-            alert(`Excel Test Evaluated! You completed ${passedCount} out of 5 tasks.`);
-            updateDashboard();
-        }
-
-        function updateTaskBadge(taskId, isPassed) {
-            const el = document.getElementById(taskId)?.querySelector('.task-status');
-            if (el && isPassed) {
-                el.innerText = "Completed";
-                el.className = "task-status bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold";
-            }
-        }
-
-        function updateDashboard() {
-            document.getElementById('dash-webmail-score').innerText = `${state.webmailMarks} / 5`;
-            document.getElementById('dash-webmail-status').innerText = state.webmailPassed ? "Passed Verification" : "Pending Verification";
-
-            document.getElementById('dash-typing-wpm').innerText = `${state.wpmScore} WPM`;
-            document.getElementById('dash-typing-status').innerText = state.wpmScore >= 30 ? "Standard Met (≥ 30 WPM)" : "Target: 30 WPM";
-
-            document.getElementById('dash-excel-score').innerText = `${state.excelMarks} / 5`;
-            document.getElementById('dash-excel-status').innerText = `Tasks Completed: ${state.excelMarks} / 5`;
-
-            // Overall Verdict logic
-            const totalMarks = state.webmailMarks + state.excelMarks;
-            const verdictTitle = document.getElementById('verdict-title');
-            const verdictDesc = document.getElementById('verdict-description');
-            const verdictBanner = document.getElementById('verdict-banner');
-
-            if (state.webmailPassed && state.wpmScore >= 30 && state.excelMarks >= 4) {
-                verdictTitle.innerText = "PASSED ASSESSMENT";
-                verdictTitle.className = "text-2xl font-bold text-emerald-800";
-                verdictDesc.innerText = `Congratulations! You met the candidate qualification standards with ${totalMarks}/10 marks and ${state.wpmScore} WPM typing speed.`;
-                verdictBanner.className = "bg-emerald-50 border border-emerald-200 rounded-xl p-6 text-center space-y-2";
-            } else if (state.wpmScore > 0 || state.webmailPassed || state.excelMarks > 0) {
-                verdictTitle.innerText = "NEEDS IMPROVEMENT";
-                verdictTitle.className = "text-2xl font-bold text-amber-800";
-                verdictDesc.innerText = `Current score: ${totalMarks}/10 marks, Typing: ${state.wpmScore} WPM. Minimum qualification requires 30 WPM and completing both Webmail & Excel tasks.`;
-                verdictBanner.className = "bg-amber-50 border border-amber-200 rounded-xl p-6 text-center space-y-2";
-            }
-        }
-
-        async function hashString(str) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(str);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        async function attemptAdminLogin() {
-            const idInput = document.getElementById('admin-id-input').value.trim();
-            const passInput = document.getElementById('admin-pass-input').value.trim();
-
-            const inputIdHash = await hashString(idInput);
-            const inputPassHash = await hashString(passInput);
-
-            if (inputIdHash === state.adminIdHash && inputPassHash === state.adminPassHash) {
-                document.getElementById('admin-login-view').classList.add('hidden');
-                document.getElementById('admin-dashboard-view').classList.remove('hidden');
-            } else {
-                alert("Invalid Admin Credentials!");
-            }
-        }
-
-        function openAdminModal() {
-            document.getElementById('admin-modal').classList.remove('hidden');
-        }
-
-        function closeAdminModal() {
-            document.getElementById('admin-modal').classList.add('hidden');
-        }
-
-        function resetAllTests() {
-            state.webmailPassed = false;
-            state.webmailMarks = 0;
-            state.excelMarks = 0;
-            state.excelTasksPassed = [false, false, false, false, false];
-            
-            document.getElementById('webmail-score-display').innerText = "0 / 5 Marks";
-            document.getElementById('badge-webmail-status').innerText = "Pending (0/5)";
-            document.getElementById('webmail-login-card').classList.remove('hidden');
-            document.getElementById('webmail-otp-card').classList.add('hidden');
-            
-            resetTypingTest();
-            renderExcelGrid();
-            
-            document.getElementById('excel-score-display').innerText = "0 / 5 Marks";
-            document.getElementById('badge-excel-status').innerText = "Pending (0/5)";
-
-            alert("Assessment reset completed!");
-            closeAdminModal();
-            updateDashboard();
-        }
-
-        window.onload = function() {
-            renderTypingText();
-            renderExcelGrid();
-            updateDashboard();
+        // Start animation loop when window loads
+        window.onload = function () {
+            animate();
         };
     </script>
-
-</body></html>
+</body>
+</html>
